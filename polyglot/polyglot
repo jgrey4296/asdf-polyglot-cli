@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+# polyglot -*- mode: sh -*-
+# Main script for polyglot projects, to hook into cargo.
+# polyglot is aliased as 'pg_' in places
+
+current_script_path="${BASH_SOURCE[0]}"
+POLY_SRC=$(realpath "$(dirname "$current_script_path")")
+if [[ -z "$POLYGLOT_ROOT" ]]; then
+    echo "Make sure theres a POLYGLOT_ROOT env var"
+fi
+
+source "$POLY_SRC/lib-util.bash"
+source "$POLY_SRC/lib-install.bash"
+source "$POLY_SRC/lib-run.bash"
+source "$POLY_SRC/lib-docs.bash"
+source "$POLY_SRC/lib-update.bash"
+
+# General
+VERBOSE=0
+SRC_DIR="$POLYGLOT_ROOT/src"
+TEMP_DIR="$POLYGLOT_ROOT/.temp"
+LOG_DIR="$TEMP_DIR/logs"
+DATA_DIR="$SRC_DIR/_data"
+ASDF_PLUGIN_LIST="$POLYGLOT_ROOT/.asdf.plugins"
+
+# Docs
+DOC_OUT="$TEMP_DIR/docs"
+SPHINX_BUILDER="html"
+
+# Tex
+TEX_USE_BIBTEX=1
+TEX_PASSES=3
+TEX_OUT="$DOC_OUT/tex"
+TEX_TARGET=""
+TEX_TARGET_FILE=""
+TEX_TARGET_DIR=""
+TEX_LUA_FILE="$POLYGLOT_ROOT/init.tex.lua"
+TEX_DEFAULT="main.tex"
+
+function pg_print_help () {
+    header "Cargo Polyglot - an access point for polyglot project management."
+    echo ""
+    echo "cargo polyglot [-v|--verbose] [subcmd] [args*] [-h | --help]"
+    echo ""
+    echo "SubCommands: "
+    echo "- i | init        : initialise the polyglot project"
+    echo "- e | export      : export additional dependencies (asdf plugins, tex packages list...)"
+    echo "- a | active      : set a directory as active"
+    echo "- d | deactivate  : unset a directory from being active"
+    echo "- release         : run release scripts to bump version num and tag commit"
+    echo "- docs            : build documentation (sphinx, mdbook, rustdoc...)"
+    echo "- tex             : run a tex compilation"
+    echo "- keystore        : setup an android keystore"
+    echo "- dispy           : disassemble a python file to bytecode"
+
+    echo ""
+}
+
+function pg_lint () {
+    header "TODO: lint"
+    # uv run ruff check --output-format concise
+    # uv run mypy
+    # uv run mypy --strict
+}
+
+function pg_test () {
+    header "TODO: tests"
+    # uv run pytest
+
+    # uv run pytest \
+    #     "--cov=$SRC_DIR" \
+    #     "--cov-report=json" \
+    #     "--cov-report=term" \
+    #     "--cov-report=xml" \
+    #     "--cov-report=html" \
+    #     "--no-cov-on-fail" \
+}
+
+function pg_export () {
+    header "Exporting Polyglot State"
+    export_asdf
+    export_tex
+    echo "done."
+}
+
+function polyglot_parse_args () {
+    if [[ "$1" = "polyglot" ]]; then
+        shift
+    fi
+    if [[ $# -eq 0  ]]; then
+        pg_print_help
+        exit
+    fi
+
+    case $1 in
+        -h|--help)
+            pg_print_help
+            exit
+            ;;
+        -v|--verbose)
+            VERBOSE=1
+            ;;
+        -t|--target)
+            echo "Target: $2"
+            ;;
+        --*=*)
+            echo "Assignment: $1"
+            ;;
+        # cmds
+        i|init)
+            init_polyglot
+            ;;
+        e|export)
+            shift
+            pg_export "$@"
+            ;;
+        a|activate)
+            echo "Activating $PWD"
+            touch "$PWD/.active"
+            ;;
+        d|deactivate)
+            if [[ -e "$PWD/.active" ]]; then
+                echo "Deactivating $PWD"
+                rm "$PWD/.active"
+            else
+                echo "Directory not active anyway"
+            fi
+            ;;
+        docs)
+            shift
+            pg_docs "$@" ;;
+        tex)  ;;
+        dispy) ;;
+        tox) ;;
+        keystore)
+            shift
+            run_keystore "$@"
+            ;;
+        release)
+            shift
+            run_release "$@"
+            ;;
+        *) # Positional
+            echo "Positional: $1"
+            ;;
+    esac
+}
+
+# get rid of the "polyglot" arg
+polyglot_parse_args "$@"

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# mdbook-polyglot -*- mode: sh -*-
+# MDbook extension preprocessor
+# see: https://rust-lang.github.io/mdBook/for_developers/preprocessors.html
+
+current_script_path="${BASH_SOURCE[0]}"
+POLYGLOT_ROOT=$(realpath "$(dirname "$(dirname "$current_script_path")")")
+
+
+case $1 in
+    supports) # pass 1
+        shift
+        if [[ "$1" = "html" ]]; then
+            exit 0
+        else
+            exit 1
+        fi
+        ;;
+    *) # pass 2, json data
+        mkdir -p "$POLYGLOT_ROOT/.temp/docs/book"
+        IFS=""
+        read -a val
+        echo "${val}" | jq "." > "$POLYGLOT_ROOT/.temp/docs/book.preproc"
+        echo "${val}" | jq ".[1]"
+        exit 0
+        ;;
+esac
