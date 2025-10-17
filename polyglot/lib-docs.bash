@@ -52,6 +52,7 @@ function run_docfx () {
 function run_doxygen () {
     subhead "[general] Running Doxygen"
     echo "TODO"
+    exit 1
     }
 
 function run_dokka () {
@@ -59,6 +60,14 @@ function run_dokka () {
     echo "TODO"
 
     }
+
+function run_rocq_doc () {
+    subhead "[rocq] Running Doc"
+    # https://rocq-prover.org/doc/V9.0.0/refman/using/tools/coqdoc.html
+    echo "TODO"
+    # rocq doc --HTML --LaTeX -d "$DOC_OUT/rocq"
+    exit 1
+}
 
 # Tex  --------------------------------------------------
 function run_tex () {

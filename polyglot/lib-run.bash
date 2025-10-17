@@ -7,18 +7,37 @@ function run_godot () {
 
 function run_prolog () {
     header "TODO: Run prolog"
+    # https://www.swi-prolog.org/pldoc/man?section=cmdline
 }
 
 function run_ansprolog () {
     header "TODO: run ansprolog"
+    # https://potassco.org/
+
 }
 
 function run_rocq () {
     header "TODO: run rocq"
+    # https://rocq-prover.org/doc/V9.0.0/refman/practical-tools/utilities.html
+
+    # rocq makefile -f _CoqProject -o CoqMakefile
+    # make -f CoqMakefile
 }
+
+#  repls --------------------------------------------------
+# TODO access points for repls
+
+function run_repl () {
+    # take 1 arg, the language
+    echo "TODO"
+    exit 1
+}
+
+#   --------------------------------------------------
 
 function run_dispy () {
     # 1 or 2 args: target, and out
+    # https://docs.python.org/3/library/dis.html#command-line-interface
     header "TODO: Python Disassembly"
     local DIS_TARGET="$1"
     shift
@@ -33,14 +52,14 @@ function run_dispy () {
     fi
 }
 
-function pg_lint () {
+function run_lint () {
     header "TODO: lint"
     # uv run ruff check --output-format concise
     # uv run mypy
     # uv run mypy --strict
 }
 
-function pg_test () {
+function run_test () {
     header "TODO: tests"
     # uv run pytest
 
@@ -51,8 +70,10 @@ function pg_test () {
     #     "--cov-report=xml" \
     #     "--cov-report=html" \
     #     "--no-cov-on-fail" \
-}
 
+    # - kotlin / gradle
+    # - elixir / mix
+}
 
 # android keystore --------------------------------------------
 function run_keystore () {
@@ -60,7 +81,7 @@ function run_keystore () {
     case $1 in
         new)
             KEYSTORE_NAME="${2:-polyglot}"
-            header "Generating Android Keystore File: $KEYSTORE_NAME"
+            header "[Android] Generating Keystore File: $KEYSTORE_NAME"
             keytool \
                 -v \
                 -genkey \

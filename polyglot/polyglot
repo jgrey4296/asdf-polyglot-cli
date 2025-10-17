@@ -46,8 +46,12 @@ function pg_print_help () {
     echo "SubCommands: "
     echo "- i | init        : initialise the polyglot project"
     echo "- e | export      : export additional dependencies (asdf plugins, tex packages list...)"
+    echo ""
     echo "- a | active      : set a directory as active"
     echo "- d | deactivate  : unset a directory from being active"
+    echo "- list            : list activated directories"
+    echo "- root            : print the root directory of the polyglot project"
+    echo ""
     echo "- release         : run release scripts to bump version num and tag commit"
     echo "- docs            : build documentation (sphinx, mdbook, rustdoc...)"
     echo "- tex             : run a tex compilation"
@@ -55,6 +59,7 @@ function pg_print_help () {
     echo "- dispy           : disassemble a python file to bytecode"
 
     echo ""
+    echo "Env Var: POLYGLOT_ROOT for the root of the project"
 }
 
 function polyglot_parse_args () {
@@ -80,7 +85,7 @@ function polyglot_parse_args () {
         --*=*)
             echo "Assignment: $1"
             ;;
-        # cmds
+        # polyglot cmds
         i|init)
             init_polyglot
             ;;
@@ -102,24 +107,42 @@ function polyglot_parse_args () {
             ;;
         list)
             echo "Active Subprojects:"
-            for sub in get_activated
+            for sub in $(get_activated)
             do
                 echo "- ${sub}"
             done
             ;;
+        root)
+            echo "${POLYGLOT_ROOT}"
+            ;;
+        # subproject focused cmds
+        release)
+            shift
+            run_release "$@"
+            ;;
         docs)
             shift
-            pg_docs "$@" ;;
-        tex)  ;;
-        dispy) ;;
-        tox) ;;
+            pg_docs "$@"
+            ;;
+        tex)
+            shift
+            pg_tex "$@"
+            ;;
+        dispy)
+            shift
+            run_dispy "$@"
+            ;;
         keystore)
             shift
             run_keystore "$@"
             ;;
-        release)
+        lint)
             shift
-            run_release "$@"
+            run_lint "$@"
+            ;;
+        test)
+            shift
+            run_lint "$@"
             ;;
         *) # Positional
             echo "Positional: $1"

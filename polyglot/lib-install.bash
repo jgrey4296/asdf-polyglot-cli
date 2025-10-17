@@ -76,3 +76,48 @@ function init_polyglot () {
     init_precommit
     echo "done."
 }
+
+
+# TODO : new -------------------------------------------
+# commands to add a new module to the workspace
+
+
+function new_py () {
+    echo "TODO"
+    exit 1
+}
+
+function new_rust () {
+    echo "TODO"
+    exit 1
+}
+
+function new_kotlin() {
+    echo "TODO"
+    exit 1
+}
+
+function new_prolog () {
+    echo "TODO"
+    exit 1
+}
+
+function new_ansprolog () {
+    echo "TODO"
+    exit 1
+}
+
+function new_elixir () {
+    echo "TODO"
+    exit 1
+}
+
+function new_dotnet () {
+    echo "TODO"
+    exit 1
+}
+
+function new_godot () {
+    echo "TODO"
+    exit 1
+}

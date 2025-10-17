@@ -32,6 +32,6 @@ function sep () {
 
 function get_activated () {
     # Get all activated subprojects
-    fdfind -H "\.active" "${POLYGLOT_ROOT}/src"
+    fdfind --base-directory "${POLYGLOT_ROOT}" --hidden "\.active" "./src" --exec dirname
 
 }
