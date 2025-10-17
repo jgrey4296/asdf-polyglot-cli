@@ -16,6 +16,7 @@ source "$POLY_SRC/lib-docs.bash"
 source "$POLY_SRC/lib-update.bash"
 
 # General
+POLYGLOT_VERSION="0.1.0"
 VERBOSE=0
 SRC_DIR="$POLYGLOT_ROOT/src"
 TEMP_DIR="$POLYGLOT_ROOT/.temp"
@@ -38,7 +39,7 @@ TEX_LUA_FILE="$POLYGLOT_ROOT/init.tex.lua"
 TEX_DEFAULT="main.tex"
 
 function pg_print_help () {
-    header "Cargo Polyglot - an access point for polyglot project management."
+    header "Polyglot ${POLYGLOT_VERSION} - an access point for polyglot project management."
     echo ""
     echo "cargo polyglot [-v|--verbose] [subcmd] [args*] [-h | --help]"
     echo ""
@@ -54,33 +55,6 @@ function pg_print_help () {
     echo "- dispy           : disassemble a python file to bytecode"
 
     echo ""
-}
-
-function pg_lint () {
-    header "TODO: lint"
-    # uv run ruff check --output-format concise
-    # uv run mypy
-    # uv run mypy --strict
-}
-
-function pg_test () {
-    header "TODO: tests"
-    # uv run pytest
-
-    # uv run pytest \
-    #     "--cov=$SRC_DIR" \
-    #     "--cov-report=json" \
-    #     "--cov-report=term" \
-    #     "--cov-report=xml" \
-    #     "--cov-report=html" \
-    #     "--no-cov-on-fail" \
-}
-
-function pg_export () {
-    header "Exporting Polyglot State"
-    export_asdf
-    export_tex
-    echo "done."
 }
 
 function polyglot_parse_args () {
@@ -112,10 +86,10 @@ function polyglot_parse_args () {
             ;;
         e|export)
             shift
-            pg_export "$@"
+            run_export "$@"
             ;;
         a|activate)
-            echo "Activating $PWD"
+            echo "[polyglot] Activating $PWD"
             touch "$PWD/.active"
             ;;
         d|deactivate)
@@ -125,6 +99,13 @@ function polyglot_parse_args () {
             else
                 echo "Directory not active anyway"
             fi
+            ;;
+        list)
+            echo "Active Subprojects:"
+            for sub in get_activated
+            do
+                echo "- ${sub}"
+            done
             ;;
         docs)
             shift

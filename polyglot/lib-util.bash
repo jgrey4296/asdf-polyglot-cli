@@ -30,3 +30,8 @@ function sep () {
     echo "-------------------------"
 }
 
+function get_activated () {
+    # Get all activated subprojects
+    fdfind -H "\.active" "${POLYGLOT_ROOT}/src"
+
+}

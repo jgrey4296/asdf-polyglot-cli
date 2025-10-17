@@ -42,3 +42,10 @@ function run_release () {
     git commit -m "[Release]: ${NEW_VERSION}"
     git tag "${NEW_VERSION}"
     }
+
+function run_export () {
+    header "Exporting Polyglot State"
+    export_asdf
+    export_tex
+    echo "done."
+}

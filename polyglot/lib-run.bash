@@ -33,7 +33,25 @@ function run_dispy () {
     fi
 }
 
-# linting --------------------------------------------------
+function pg_lint () {
+    header "TODO: lint"
+    # uv run ruff check --output-format concise
+    # uv run mypy
+    # uv run mypy --strict
+}
+
+function pg_test () {
+    header "TODO: tests"
+    # uv run pytest
+
+    # uv run pytest \
+    #     "--cov=$SRC_DIR" \
+    #     "--cov-report=json" \
+    #     "--cov-report=term" \
+    #     "--cov-report=xml" \
+    #     "--cov-report=html" \
+    #     "--no-cov-on-fail" \
+}
 
 
 # android keystore --------------------------------------------
