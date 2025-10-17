@@ -6,7 +6,8 @@ function run_dotnet_update () {
         dotnet new sln
     fi
 
-    fdfind ".(cs|fs)proj" "$POLYGLOT_ROOT" --exec dotnet sln add
+    # must be run sequentially
+    fdfind ".(cs|fs)proj" "$POLYGLOT_ROOT" --threads=1 --exec dotnet sln add
 }
 
 function export_asdf () {
