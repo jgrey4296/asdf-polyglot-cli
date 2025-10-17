@@ -26,6 +26,12 @@ function install_docfx () {
 
 }
 
+function install_dokka () {
+    echo "TODO"
+    # https://kotlinlang.org/docs/dokka-cli.html#generate-documentation
+    exit 1
+    }
+
 # init --------------------------------------------------
 
 function init_tex () {
@@ -81,43 +87,103 @@ function init_polyglot () {
 # TODO : new -------------------------------------------
 # commands to add a new module to the workspace
 
-
 function new_py () {
     echo "TODO"
     exit 1
 }
-
 function new_rust () {
     echo "TODO"
     exit 1
 }
-
 function new_kotlin() {
     echo "TODO"
     exit 1
 }
-
 function new_prolog () {
     echo "TODO"
     exit 1
 }
-
 function new_ansprolog () {
     echo "TODO"
     exit 1
 }
-
 function new_elixir () {
     echo "TODO"
     exit 1
 }
-
 function new_dotnet () {
     echo "TODO"
     exit 1
 }
-
 function new_godot () {
+    echo "TODO"
+    exit 1
+}
+function new_lisp () {
+    echo "TODO"
+    exit 1
+}
+function new_lua () {
+    echo "TODO"
+    exit 1
+}
+function new_csound () {
+    echo "TODO"
+    exit 1
+}
+function new_inform () {
+    echo "TODO"
+    exit 1
+}
+
+# TODO add deps  --------------------------------------------------
+
+function add_py () {
+    echo "TODO"
+    # uv add
+    exit 1
+}
+function add_rust () {
+    echo "TODO"
+    # cargo add
+    exit 1
+}
+function add_kotlin () {
+    echo "TODO"
+    exit 1
+}
+function add_dotnet () {
+    echo "TODO"
+    # dotnet nuget add
+    exit 1
+}
+function add_elixir () {
+    echo "TODO"
+    # add into mix.exs deps
+    exit 1
+}
+function add_texlive () {
+    echo "TODO"
+    # tlmgr install
+    exit 1
+}
+function add_lisp () {
+    echo "TODO"
+    exit 1
+}
+function add_lua () {
+    echo "TODO"
+    exit 1
+}
+function add_csound () {
+    echo "TODO"
+    exit 1
+}
+function add_inform () {
+    echo "TODO"
+    exit 1
+}
+function add_py () {
     echo "TODO"
     exit 1
 }

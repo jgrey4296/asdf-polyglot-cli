@@ -52,13 +52,15 @@ function run_docfx () {
 function run_doxygen () {
     subhead "[general] Running Doxygen"
     echo "TODO"
+    # doxgen "$POLYGLOT_ROOT/.doxygen"
     exit 1
     }
 
 function run_dokka () {
     subhead "[kotlin] Running Dokka"
+    # https://kotlinlang.org/docs/dokka-cli.html
     echo "TODO"
-
+    # java -jar dokka-cli-2.0.0.jar "$@" "$POLYGLOT_ROOT/dokka-configuration.json"
     }
 
 function run_rocq_doc () {
