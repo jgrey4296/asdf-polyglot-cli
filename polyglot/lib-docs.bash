@@ -46,7 +46,7 @@ function run_exdoc () {
 
 function run_docfx () {
     subhead "[dotnet] Running docfx"
-
+    docfx "$POLYGLOT_ROOT/docfx.json"
     }
 
 function run_doxygen () {
