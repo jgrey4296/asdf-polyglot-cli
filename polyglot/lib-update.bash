@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
 function run_dotnet_update () {
-    if [[ -n "$DOTNET_ROOT" ]] && [[ -d "$DOTNET_ROOT" ]]; then
+    if [[ -z $(fdfind "\.sln" "$POLYGLOT_ROOT") ]]; then
+        echo "Creating new sln"
         dotnet new sln
-        dotnet sln add ./src/cs_*
     fi
+
+    fdfind ".(cs|fs)proj" "$POLYGLOT_ROOT" --exec dotnet sln add
 }
 
 function export_asdf () {
@@ -15,6 +17,10 @@ function export_asdf () {
 function export_tex () {
     tdot "Exporting Tex libraries"
     asdf cmd texlive reqs
+}
+
+function update_polyglot () {
+    run_dotnet_update
 }
 
 # Release --------------------------------------------------

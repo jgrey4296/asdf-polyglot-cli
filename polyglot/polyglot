@@ -90,6 +90,9 @@ function polyglot_parse_args () {
         i|init)
             init_polyglot
             ;;
+        u|update)
+            update_polyglot
+            ;;
         e|export)
             shift
             run_export "$@"

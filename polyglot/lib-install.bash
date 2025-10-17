@@ -73,12 +73,20 @@ function init_precommit () {
     fi
 }
 
+function init_dotnet() {
+    if [[ -z $(fdfind "\.sln" "$POLYGLOT_ROOT") ]]; then
+        echo "Creating new sln"
+        dotnet new sln
+    fi
+}
+
 function init_polyglot () {
     header "Initialising Polyglot Project"
     mkdir -p "$TEMP_DIR"
     init_asdf
     init_py
     init_tex
+    init_dotnet
     init_precommit
     echo "done."
 }
