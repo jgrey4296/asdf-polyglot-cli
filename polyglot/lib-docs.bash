@@ -2,6 +2,7 @@
 
 function run_mdbook () {
     if [[ ! -e "$POLYGLOT_ROOT/book.toml" ]]; then
+        echo "NOT FOUND: $POLYGLOT_ROOT/book.toml"
         return
     fi
 
@@ -10,7 +11,8 @@ function run_mdbook () {
 }
 
 function run_sphinx () {
-    if [[ ! -e "$CONF_DIR/conf.py" ]]; then
+    if [[ ! -e "$SPHINX_CONF_DIR/conf.py" ]]; then
+        echo "NOT FOUND: $SPHINX_CONF_DIR/conf.py"
         return
     fi
     subhead "[python] Building Sphinx"
@@ -39,6 +41,7 @@ function run_sphinx () {
 
 function run_rustdoc () {
     if [[ ! -e "$POLYGLOT_ROOT/Cargo.toml" ]]; then
+        echo "NOT FOUND: $POLYGLOT_ROOT/Cargo.toml"
         return
     fi
     subhead "[rust] Building Rustdoc"
@@ -49,6 +52,7 @@ function run_rustdoc () {
 
 function run_exdoc () {
     if [[ ! -e "$POLYGLOT_ROOT/mix.exs" ]]; then
+        echo "NOT FOUND: $POLYGLOT_ROOT/mix.exs"
         return
     fi
     subhead "[elixir] Building ExDoc"
@@ -57,6 +61,7 @@ function run_exdoc () {
 
 function run_docfx () {
     if [[ ! -e "$POLYGLOT_ROOT/docfx.json" ]]; then
+        echo "NOT FOUND: $POLYGLOT_ROOT/docfx.json"
         return
     fi
     subhead "[dotnet] Running docfx"
@@ -65,6 +70,7 @@ function run_docfx () {
 
 function run_doxygen () {
     if [[ ! -e "$POLYGLOT_ROOT/.doxygen" ]]; then
+        echo "NOT FOUND: $POLYGLOT_ROOT/.doxygen"
         return
     fi
     subhead "[general] Running Doxygen"
@@ -75,6 +81,7 @@ function run_doxygen () {
 
 function run_dokka () {
     if [[ ! -e "$POLYGLOT_ROOT/dokka.json" ]]; then
+        echo "NOT FOUND: $POLYGLOT_ROOT/dokka.json"
         return
     fi
     subhead "[kotlin] Running Dokka"
@@ -85,6 +92,7 @@ function run_dokka () {
 
 function run_rocq_doc () {
     if [[ ! -e "$POLYGLOT_ROOT/_CoqProject" ]]; then
+        echo "NOT FOUND: $POLYGLOT_ROOT/_CoqProject"
         return
     fi
     subhead "[rocq] Running Doc"
@@ -152,9 +160,6 @@ function _bibtex_pass () {
 
 function find_tex_file () {
     # Takes 1 or 0 args
-    local tex_target_base
-    local tex_rel_dir
-
     TEX_TARGET_FILE=$(fdfind \
         --full-path \
         --extension ".tex" \
@@ -166,7 +171,7 @@ function find_tex_file () {
         fail "Could not find a tex target file"
     fi
     tex_rel_base=$(dirname "$TEX_TARGET_FILE")
-    tex_target_base=$(basename "$TARGET_FILE" ".tex")
+    # tex_target_base=$(basename "$TARGET_FILE" ".tex")
     TEX_TARGET_DIR="$SRC_DIR/$tex_rel_base"
 }
 

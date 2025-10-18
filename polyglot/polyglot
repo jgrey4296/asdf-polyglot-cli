@@ -62,23 +62,22 @@ function pg_print_help () {
     echo "- tex             : run a tex compilation"
     echo "- keystore        : setup an android keystore"
     echo "- dispy           : disassemble a python file to bytecode"
-
+    echo "- vars            : echo out just the env vars for redirecting into .envrc"
     echo ""
     pg_stub_env_vars
 }
 
 function pg_stub_env_vars () {
-    echo "-- Polyglot Environment Variables for .envrc"
+    echo "# -- Polyglot Environment Variables for .envrc"
     echo "export POLYGLOT_ROOT=\"\$PWD\""
     echo "export POLYGLOT_SRC=\"src\""
     echo "export POLYGLOT_TEMP=\".temp\""
     echo "export POLYGLOT_SPHINX_BUILDER=\"html\""
-    echo "export POLYGLOT_SPHINX_CONFIG_DIR=\"\$POLYGLOT_SRC/_sphinx\""
+    echo "export POLYGLOT_SPHINX_CONF_DIR=\"\$POLYGLOT_SRC/_sphinx\""
     echo "export POLYGLOT_USE_BIBTEX=1"
-    echo "--"
+    echo "# --"
 
 }
-
 
 
 function polyglot_parse_args () {
