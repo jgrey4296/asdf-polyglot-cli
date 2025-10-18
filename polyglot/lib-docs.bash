@@ -1,14 +1,21 @@
 #!/usr/bin/env bash
 
 function run_mdbook () {
+    if [[ ! -e "$POLYGLOT_ROOT/book.toml" ]]; then
+        return
+    fi
+
     subhead "Building Mdbook"
     mdbook build
 }
 
 function run_sphinx () {
-    subhead "[python] Building Sphinx"
     local CONF_DIR="$SRC_DIR/_sphinx"
     local SPHINX_OUT="$DOC_OUT/sphinx"
+    if [[ ! -e "$CONF_DIR/conf.py" ]]; then
+        return
+    fi
+    subhead "[python] Building Sphinx"
 
     echo "- config location: ${CONF_DIR}"
     echo "- out location: ${SPHINX_OUT}"
@@ -33,6 +40,9 @@ function run_sphinx () {
 }
 
 function run_rustdoc () {
+    if [[ ! -e "$POLYGLOT_ROOT/Cargo.toml" ]]; then
+        return
+    fi
     subhead "[rust] Building Rustdoc"
     cargo doc \
         --workspace \
@@ -40,16 +50,25 @@ function run_rustdoc () {
 }
 
 function run_exdoc () {
+    if [[ ! -e "$POLYGLOT_ROOT/mix.exs" ]]; then
+        return
+    fi
     subhead "[elixir] Building ExDoc"
     mix docs --output "$DOC_OUT/elixir"
 }
 
 function run_docfx () {
+    if [[ ! -e "$POLYGLOT_ROOT/docfx.json" ]]; then
+        return
+    fi
     subhead "[dotnet] Running docfx"
     docfx "$POLYGLOT_ROOT/docfx.json"
     }
 
 function run_doxygen () {
+    if [[ ! -e "$POLYGLOT_ROOT/.doxygen" ]]; then
+        return
+    fi
     subhead "[general] Running Doxygen"
     echo "TODO"
     # doxgen "$POLYGLOT_ROOT/.doxygen"
@@ -57,13 +76,19 @@ function run_doxygen () {
     }
 
 function run_dokka () {
+    if [[ ! -e "$POLYGLOT_ROOT/dokka.json" ]]; then
+        return
+    fi
     subhead "[kotlin] Running Dokka"
     # https://kotlinlang.org/docs/dokka-cli.html
     echo "TODO"
-    # java -jar dokka-cli-2.0.0.jar "$@" "$POLYGLOT_ROOT/dokka-configuration.json"
+    # java -jar dokka-cli-2.0.0.jar "$@" "$POLYGLOT_ROOT/dokka.json"
     }
 
 function run_rocq_doc () {
+    if [[ ! -e "$POLYGLOT_ROOT/_CoqProject" ]]; then
+        return
+    fi
     subhead "[rocq] Running Doc"
     # https://rocq-prover.org/doc/V9.0.0/refman/using/tools/coqdoc.html
     echo "TODO"
