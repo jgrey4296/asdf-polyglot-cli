@@ -19,24 +19,28 @@ source "$POLY_SRC/lib-update.bash"
 # General
 POLYGLOT_VERSION="0.1.0"
 VERBOSE=0
-SRC_DIR="$POLYGLOT_ROOT/src"
-TEMP_DIR="$POLYGLOT_ROOT/.temp"
+SRC_DIR="$POLYGLOT_ROOT/${POLYGLOT_SRC:-src}"
+TEMP_DIR="$POLYGLOT_ROOT/${POLYGLOT_TEMP:-.temp}"
 LOG_DIR="$TEMP_DIR/logs"
 DATA_DIR="$SRC_DIR/_data"
 ASDF_PLUGIN_LIST="$POLYGLOT_ROOT/.asdf.plugins"
 
 # Docs
 DOC_OUT="$TEMP_DIR/docs"
-SPHINX_BUILDER="html"
+SPHINX_BUILDER="${POLYGLOT_SPHINX_BUILDER:-html}"
+SPHINX_CONF_DIR="${POLYGLOT_SPHINX_CONF_DIR:-${SRC_DIR}/_sphinx}"
+SPHINX_OUT="$DOC_OUT/sphinx"
 
 # Tex
-TEX_USE_BIBTEX=1
+TEX_USE_BIBTEX="${POLYGLOT_USE_BIBTEX:-1}"
+# shellcheck disable=SC2034
 TEX_PASSES=3
 TEX_OUT="$DOC_OUT/tex"
 TEX_TARGET=""
 TEX_TARGET_FILE=""
 TEX_TARGET_DIR=""
 TEX_LUA_FILE="$POLYGLOT_ROOT/init.tex.lua"
+# shellcheck disable=SC2034
 TEX_DEFAULT="main.tex"
 
 function pg_print_help () {
@@ -60,8 +64,22 @@ function pg_print_help () {
     echo "- dispy           : disassemble a python file to bytecode"
 
     echo ""
-    echo "Env Var: POLYGLOT_ROOT for the root of the project"
+    pg_stub_env_vars
 }
+
+function pg_stub_env_vars () {
+    echo "-- Polyglot Environment Variables for .envrc"
+    echo "export POLYGLOT_ROOT=\"\$PWD\""
+    echo "export POLYGLOT_SRC=\"src\""
+    echo "export POLYGLOT_TEMP=\".temp\""
+    echo "export POLYGLOT_SPHINX_BUILDER=\"html\""
+    echo "export POLYGLOT_SPHINX_CONFIG_DIR=\"\$POLYGLOT_SRC/_sphinx\""
+    echo "export POLYGLOT_USE_BIBTEX=1"
+    echo "--"
+
+}
+
+
 
 function polyglot_parse_args () {
     if [[ "$1" = "polyglot" ]]; then
@@ -147,6 +165,9 @@ function polyglot_parse_args () {
         test)
             shift
             run_lint "$@"
+            ;;
+        vars)
+            pg_stub_env_vars
             ;;
         *) # Positional
             echo "Positional: $1"

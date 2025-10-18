@@ -10,14 +10,12 @@ function run_mdbook () {
 }
 
 function run_sphinx () {
-    local CONF_DIR="$SRC_DIR/_sphinx"
-    local SPHINX_OUT="$DOC_OUT/sphinx"
     if [[ ! -e "$CONF_DIR/conf.py" ]]; then
         return
     fi
     subhead "[python] Building Sphinx"
 
-    echo "- config location: ${CONF_DIR}"
+    echo "- config location: ${SPHINX_CONF_DIR}"
     echo "- out location: ${SPHINX_OUT}"
     echo "- builder: ${SPHINX_BUILDER}"
     echo ""
@@ -30,7 +28,7 @@ function run_sphinx () {
         --verbose \
         --write-all \
         --fresh-env \
-        --conf-dir "$CONF_DIR" \
+        --conf-dir "$SPHINX_CONF_DIR" \
         --doctree-dir "$SPHINX_OUT/.doctrees" \
         --warning-file "$LOG_DIR/sphinx.log" \
         --builder "$SPHINX_BUILDER" \
@@ -177,14 +175,8 @@ function find_tex_file () {
 function pg_docs () {
     # Takes N args.
     header "Building Docs"
-    local _sphinx=0
-    local _mdbook=0
-    local _rustdoc=0
-    local _exdoc=0
-    local _dotnet=0
-    local _doxygen=0
-
     local LOOP_ARGS=("$@")
+    local _mdbook=0
     if [[ ${#LOOP_ARGS[@]} -eq 1 ]] && [[ ${LOOP_ARGS[0]} = "--all" ]]; then
         LOOP_ARGS=( --book --sphinx --rust --elixir --dotnet --doxy --kotlin )
     fi
