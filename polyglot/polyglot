@@ -63,6 +63,7 @@ function pg_print_help () {
     echo "- keystore        : setup an android keystore"
     echo "- dispy           : disassemble a python file to bytecode"
     echo "- vars            : echo out just the env vars for redirecting into .envrc"
+    echo "- change          : create a change notification"
     echo ""
     pg_stub_env_vars
 }
@@ -78,7 +79,6 @@ function pg_stub_env_vars () {
     echo "# --"
 
 }
-
 
 function polyglot_parse_args () {
     if [[ "$1" = "polyglot" ]]; then
@@ -135,6 +135,10 @@ function polyglot_parse_args () {
             ;;
         root)
             echo "${POLYGLOT_ROOT}"
+            ;;
+        change)
+            shift
+            towncrier create --no-edit "+.${1:-feature}"
             ;;
         # subproject focused cmds
         release)
