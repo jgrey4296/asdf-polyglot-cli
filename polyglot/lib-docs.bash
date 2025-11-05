@@ -102,6 +102,13 @@ function run_rocq_doc () {
     exit 1
 }
 
+function run_repo_report () {
+    header "TODO: Repo Report"
+    # generate lines of code, num of files,
+    # active languages...
+    fail "Not implemented"
+}
+
 # Tex  --------------------------------------------------
 function run_tex () {
     header "[tex] Lualatex Compilation"

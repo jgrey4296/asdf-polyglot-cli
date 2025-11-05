@@ -38,7 +38,7 @@ function run_repl () {
 function run_dispy () {
     # 1 or 2 args: target, and out
     # https://docs.python.org/3/library/dis.html#command-line-interface
-    header "TODO: Python Disassembly"
+    header "Python Disassembly"
     local DIS_TARGET="$1"
     shift
     local DIS_OUT="$1"
