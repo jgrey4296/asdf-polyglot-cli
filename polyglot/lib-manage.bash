@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 # lib-manage.bash -*- mode: sh -*-
 
-function pg_manageg_init () {
-    echo "TODO: initialise a polyglot.toml file"
+current_script_path="${BASH_SOURCE[0]}"
+toml_template=$(realpath "$(dirname "$current_script_path")")/polyglot.template
+
+function pg_manage_init () {
+    echo "initialise a polyglot.toml file"
+    cp "$toml_template" "$POLY_SRC"
 
 }
 

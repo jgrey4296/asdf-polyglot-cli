@@ -1,23 +1,9 @@
 #!/usr/bin/env bash
 
-function run_dotnet_update () {
-    if [[ -z $(fdfind "\.sln" "$POLYGLOT_ROOT") ]]; then
-        echo "Creating new sln"
-        dotnet new sln
-    fi
-
-    # must be run sequentially
-    fdfind ".(cs|fs)proj" "$POLYGLOT_ROOT" --threads=1 --exec dotnet sln add
-}
 
 function export_asdf () {
     tdot "Exporting ASDF plugins"
     asdf plugin list --urls > "$ASDF_PLUGIN_LIST"
-}
-
-function export_tex () {
-    tdot "Exporting Tex libraries"
-    asdf cmd texlive reqs
 }
 
 function update_polyglot () {
@@ -42,14 +28,8 @@ function run_release () {
         towncrier check || fail "There are no fragment changes. Add descriptions of this release."
     fi
 
-    subhead "Calculating Version Number"
-    CURR_VERSION=$(version version)
-    version "$LEVEL" "set" "+"
-    NEW_VERSION=$(version version)
-    echo "Project Version $CURR_VERSION -> $NEW_VERSION"
-
-    subhead "Generating Changelog"
-    towncrier build --yes
+    run_version
+    run_towncrier
     run_export
 
     git add --all

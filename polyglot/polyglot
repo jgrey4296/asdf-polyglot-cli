@@ -17,6 +17,7 @@ source "$POLY_SRC/lib-install.bash"
 source "$POLY_SRC/lib-run.bash"
 source "$POLY_SRC/lib-docs.bash"
 source "$POLY_SRC/lib-update.bash"
+source "$POLY_SRC/lib-manage.bash"
 
 # General
 VERBOSE=0
