@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+#  polyglot-help -*- mode: sh -*-
+
+header "Polyglot ${POLYGLOT_VERSION} - an access point for polyglot project management."
+echo -e "
+cargo polyglot [-v|--verbose] [subcmd] [args*] [-h | --help]
+
+SubCommands:
+- i | init        : initialise the polyglot project
+- e | export      : export additional dependencies (asdf plugins, tex packages list...)
+
+- a | active      : set a directory as active
+- d | deactivate  : unset a directory from being active
+- list            : list activated directories
+- root            : print the root directory of the polyglot project
+
+- release         : run release scripts to bump version num and tag commit
+- docs            : build documentation (sphinx, mdbook, rustdoc...)
+- tex             : run a tex compilation
+- keystore        : setup an android keystore
+- dispy           : disassemble a python file to bytecode
+- vars            : echo out just the env vars for redirecting into .envrc
+- change          : create a change notification
+"

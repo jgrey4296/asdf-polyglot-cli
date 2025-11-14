@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#  polyglot-lang -*- mode: sh -*-
+
+# Create a new subpackage
+# polyglot lang {lang} sub {name}
+
+# Add a new dependency
+# polyglot lang {lang} add {dep}
+
+# List the lang's configs:
+# polyglot lang {lang} configs

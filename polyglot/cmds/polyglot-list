@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#  polyglot-list -*- mode: sh -*-
+
+
+echo "Active Subprojects:"
+for sub in $(get_activated)
+do
+    echo "- ${sub}"
+done

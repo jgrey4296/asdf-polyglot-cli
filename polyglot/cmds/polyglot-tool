@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+#  polyglot-release -*- mode: sh -*-
+
+echo "TODO: run $1"
+
+# Run a named tool
+# polyglot tool {name} {args}
+
+# Run a lang's tool
+# polyglot tool -lang {lang} {name} {args}

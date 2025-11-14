@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#  polyglot-repl -*- mode: sh -*-
+
+echo "TODO: select and start a repl for polyglot"
+
+# Start a langs repl:
+# polyglot repl {lang}

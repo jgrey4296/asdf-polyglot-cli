@@ -12,12 +12,9 @@ if [[ -z "$POLYGLOT_ROOT" ]]; then
     exit 1
 fi
 
-source "$POLY_SRC/lib-util.bash"
-source "$POLY_SRC/lib-install.bash"
-source "$POLY_SRC/lib-run.bash"
-source "$POLY_SRC/lib-docs.bash"
-source "$POLY_SRC/lib-update.bash"
-source "$POLY_SRC/lib-manage.bash"
+source "$POLY_SRC/lib/lib-"*.bash
+source "$POLY_SRC/lang/lang-"*.bash
+source "$POLY_SRC/tool/tool-"*.bash
 
 # General
 VERBOSE=0
@@ -45,55 +42,18 @@ TEX_LUA_FILE="$POLYGLOT_ROOT/init.tex.lua"
 # shellcheck disable=SC2034
 TEX_DEFAULT="main.tex"
 
-function pg_print_help () {
-    header "Polyglot ${POLYGLOT_VERSION} - an access point for polyglot project management."
-    echo -e "
-cargo polyglot [-v|--verbose] [subcmd] [args*] [-h | --help]
-
-SubCommands:
-- i | init        : initialise the polyglot project
-- e | export      : export additional dependencies (asdf plugins, tex packages list...)
-
-- a | active      : set a directory as active
-- d | deactivate  : unset a directory from being active
-- list            : list activated directories
-- root            : print the root directory of the polyglot project
-
-- release         : run release scripts to bump version num and tag commit
-- docs            : build documentation (sphinx, mdbook, rustdoc...)
-- tex             : run a tex compilation
-- keystore        : setup an android keystore
-- dispy           : disassemble a python file to bytecode
-- vars            : echo out just the env vars for redirecting into .envrc
-- change          : create a change notification
-"
-    pg_stub_env_vars
-}
-
-function pg_stub_env_vars () {
-    echo "# -- Polyglot Environment Variables for .envrc"
-    echo "export POLYGLOT_ROOT=\"\$PWD\""
-    echo "export POLYGLOT_SRC=\"src\""
-    echo "export POLYGLOT_TEMP=\".temp\""
-    echo "export POLYGLOT_SPHINX_BUILDER=\"html\""
-    echo "export POLYGLOT_SPHINX_CONF_DIR=\"\$POLYGLOT_SRC/_sphinx\""
-    echo "export POLYGLOT_USE_BIBTEX=1"
-    echo "# --"
-
-}
-
 function polyglot_parse_args () {
     if [[ "$1" = "polyglot" ]]; then
         shift
     fi
     if [[ $# -eq 0  ]]; then
-        pg_print_help
+        polyglot-help
         exit
     fi
 
     case $1 in
         -h|--help)
-            pg_print_help
+            polyglot-help
             exit
             ;;
         --version)
@@ -110,72 +70,50 @@ function polyglot_parse_args () {
             ;;
         # polyglot cmds
         i|init)
-            init_polyglot
+            shift
+            polyglot-init "$@"
             ;;
         u|update)
-            update_polyglot
+            shift
+            polyglot-update "$@"
             ;;
         e|export)
             shift
-            run_export "$@"
+            polyglot-export "$@"
             ;;
         a|activate)
-            echo "[polyglot] Activating $PWD"
-            touch "$PWD/.active"
+            shift
+            polyglot-activate "$@"
             ;;
         d|deactivate)
-            if [[ -e "$PWD/.active" ]]; then
-                echo "Deactivating $PWD"
-                rm "$PWD/.active"
-            else
-                echo "Directory not active anyway"
-            fi
+            shift
+            polyglot-deactivate "$@"
             ;;
         list)
-            echo "Active Subprojects:"
-            for sub in $(get_activated)
-            do
-                echo "- ${sub}"
-            done
+            shift
+            polyglot-list "$@"
             ;;
         root)
             echo "${POLYGLOT_ROOT}"
             ;;
         change)
             shift
-            towncrier create --no-edit "+.${1:-feature}"
+            polyglot-change "$1"
             ;;
-        # subproject focused cmds
         release)
             shift
-            run_release "$@"
+            polyglot-release "$@"
             ;;
         docs)
             shift
-            pg_docs "$@"
+            polyglot-docs "$@"
             ;;
-        tex)
+        tool)
             shift
-            pg_tex "$@"
-            ;;
-        dispy)
-            shift
-            run_dispy "$@"
-            ;;
-        keystore)
-            shift
-            run_keystore "$@"
-            ;;
-        lint)
-            shift
-            run_lint "$@"
-            ;;
-        test)
-            shift
-            run_lint "$@"
+            polyglot-tool "$@"
             ;;
         vars)
-            pg_stub_env_vars
+            polyglot-envrc
             ;;
         *) # Positional
             echo "Positional: $1"

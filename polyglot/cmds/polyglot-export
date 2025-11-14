@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+#  polyglot-export -*- mode: sh -*-
+
+header "Exporting Polyglot State"
+export_asdf
+
+if [[ -e "$POLYGLOT_ROOT/tex.reqs" ]]; then
+    export_tex
+fi
+echo "done."

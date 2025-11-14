@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 # Install scripts for various tooling for polyglot
 
-
-
-
 # init --------------------------------------------------
 
 
@@ -27,15 +24,3 @@ function init_precommit () {
         pre-commit install
     fi
 }
-
-function init_polyglot () {
-    header "Initialising Polyglot Project"
-    mkdir -p "$TEMP_DIR"
-    init_asdf
-    init_py
-    init_tex
-    init_dotnet
-    init_precommit
-    echo "done."
-}
-

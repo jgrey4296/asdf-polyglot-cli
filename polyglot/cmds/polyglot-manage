@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# lib-manage.bash -*- mode: sh -*-
-
+#  polyglot-manage -*- mode: sh -*-
 current_script_path="${BASH_SOURCE[0]}"
 toml_template=$(realpath "$(dirname "$current_script_path")")/polyglot.template
 
@@ -36,7 +35,6 @@ function pg_manage_validate () {
 function pg_manage_checklist () {
     echo "TODO: checklist"
 }
-
 
 function pg_manage_regenerate () {
     echo "TODO: regenerate"

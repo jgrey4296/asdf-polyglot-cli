@@ -35,3 +35,16 @@ function get_activated () {
     fdfind --base-directory "${POLYGLOT_ROOT}" --hidden "\.active" "./src" --exec dirname
 
 }
+
+function source_dir () {
+    shopt -s globstar
+    for key in "$POLY_SRC/sub/"*.bash;
+    do
+        case "$key" in
+            *)
+                source "$key"
+                ;;
+        esac
+    done
+
+}

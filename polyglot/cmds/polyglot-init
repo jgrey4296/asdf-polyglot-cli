@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+#  polyglot-init -*- mode: sh -*-
+
+# For initialising the project
+
+header "Initialising Polyglot Project"
+mkdir -p "$TEMP_DIR"
+
+# run init for each lang/tool:
+init_asdf
+init_py
+init_tex
+init_dotnet
+init_precommit
+echo "done."
