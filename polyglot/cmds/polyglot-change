@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-#  polyglot-change -*- mode: sh -*-
-
-towncrier create --no-edit "+.${1:-feature}"

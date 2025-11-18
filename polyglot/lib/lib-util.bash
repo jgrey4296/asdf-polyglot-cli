@@ -48,3 +48,18 @@ function source_dir () {
     done
 
 }
+
+function tasks_path () {
+    # Return the PATH augmented with the projects .tasks dir
+    fail "TODO"
+}
+
+function langs_path () {
+    # return the PATH augmented with the projects .tasks/lang-$1 dir
+    fail "TODO"
+}
+
+function tools_path () {
+    # return the PATH augmented with the projects .tasks/tool-$1 dir
+    fail "TODO"
+}
