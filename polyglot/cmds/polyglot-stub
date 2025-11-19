@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+# polyglot-stub.bash -*- mode: sh -*-
+#set -o errexit
+set -o nounset
+set -o pipefail
+
+source "$POLY_SRC/lib/lib-util.bash"
+
+function print-help () {
+    case "${@: -1}" in
+        -h|--help) ;;
+        *) if [[ "$#" -gt 0 ]]; then
+               return
+           fi
+           ;;
+    esac
+    echo -e "stub help "
+    exit 2
+}
+
+header "polyglot stub"
+print-help "$@"
+
+echo "TODO: stub"
+
+
+function print-hook-help-stub () {
+    echo -e '
+#!/usr/bin/env bash
+set -o nounset
+set -o pipefail
+
+case "${@: -1}" in
+    -h|--help)
+    # hook help:
+
+    exit 2 ;;
+    *) ;;
+esac
+'
+}
+
+function print-hook-stub () {
+    echo -e '
+#!/usr/bin/env bash
+#
+# shellcheck disable=SC1091
+source "$POLY_SRC/lib/lib-util.bash"
+
+fname=$(basename "${BASH_SOURCE[0]}")
+header "($HOOK_NUM): $fname.\n* Args: " "$@"
+
+# Parse args:
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -t|--target)
+            echo "Target: $2"
+            ;;
+        --bloo=*)
+            echo "Assignment: $1"
+            IFS="=" read -ra KEYVAL <<< "$1"
+            echo "Key: ${KEYVAL[0]/--/}"
+            echo "Val: ${KEYVAL[1]}"
+            ;;
+        *) # Positional
+            echo "Positional: $1"
+            ;;
+    esac
+    shift
+done
+
+echo "TODO: hook implementation"
+
+# Return Codes:
+# - 0 : success
+# - 1 : failure
+# - 2 : help printed
+'
+}
+
+function print-lang-cmd-stub () {
+    echo "TODO"
+
+}
+
+function print-tool-cmd-stub () {
+    echo "TODO"
+
+}
+
+function print-envrc-stub () {
+    echo "TODO"
+    echo "# -- Polyglot Environment Variables for .envrc
+export POLYGLOT_ROOT=\"\$PWD\"
+export POLYGLOT_SRC=\"src\"
+export POLYGLOT_TEMP=\".temp\"
+export POLYGLOT_SPHINX_BUILDER=\"html\"
+export POLYGLOT_SPHINX_CONF_DIR=\"\$POLYGLOT_SRC/_sphinx\"
+export POLYGLOT_USE_BIBTEX=1
+# --"
+}

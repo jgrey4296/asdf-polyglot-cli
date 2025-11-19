@@ -1,24 +1,16 @@
 #!/usr/bin/env bash
 #  polyglot-help -*- mode: sh -*-
 
-header "Polyglot ${POLYGLOT_VERSION} - an access point for polyglot project management."
-echo -e "
-cargo polyglot [-v|--verbose] [subcmd] [args*] [-h | --help]
+# shellcheck disable=SC1091
+source "$POLY_SRC/lib/lib-util.bash"
 
-SubCommands:
-- i | init        : initialise the polyglot project
-- e | export      : export additional dependencies (asdf plugins, tex packages list...)
+header "Polyglot ${POLYGLOT_VERSION}\n|   An access point for polyglot project management."
 
-- a | active      : set a directory as active
-- d | deactivate  : unset a directory from being active
-- list            : list activated directories
-- root            : print the root directory of the polyglot project
+echo -e "\nAvailable Polyglot cmds:"
+for task in $(find "$POLY_SRC/cmds" -executable -a -type f | sort -V)
+do
+    cmdname=$(basename "$task")
+    echo "- ${cmdname/polyglot-/}"
+done
 
-- release         : run release scripts to bump version num and tag commit
-- docs            : build documentation (sphinx, mdbook, rustdoc...)
-- tex             : run a tex compilation
-- keystore        : setup an android keystore
-- dispy           : disassemble a python file to bytecode
-- vars            : echo out just the env vars for redirecting into .envrc
-- change          : create a change notification
-"
+echo "- list [langs | tools | tasks]"

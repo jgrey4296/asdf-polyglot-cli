@@ -1,9 +1,45 @@
 #!/usr/bin/env bash
-#  polyglot-list -*- mode: sh -*-
+# polyglot-list.bash -*- mode: sh -*-
+#set -o errexit
+set -o nounset
+set -o pipefail
 
+source "$POLY_SRC/lib/lib-util.bash"
 
-echo "Active Subprojects:"
-for sub in $(get_activated)
+function print-help () {
+    case "${@: -1}" in
+        -h|--help) ;;
+        *) if [[ "$#" -gt 0 ]]; then
+               return
+           fi
+           ;;
+    esac
+    echo -e "list help"
+    exit 2
+}
+
+print-help "$@"
+TARGET=""
+case "${1:-}" in
+    tasks|t)
+        TARGET="task-"
+        ;;
+    langs|l)
+        TARGET="lang-"
+        ;;
+    tools|o)
+        TARGET="tool-"
+        ;;
+    *)
+        echo "Unknown target"
+        exit 1
+        ;;
+esac
+
+echo -e "Polyglot Registered ${TARGET/-/}s:"
+base=$(realpath "$POLYGLOT_ROOT/.tasks")
+for targ in $(find "$base" -maxdepth 1 -name "${TARGET}*" | sort -V)
 do
-    echo "- ${sub}"
+    name=$(basename "$targ")
+    echo "- ${name/$TARGET/}"
 done

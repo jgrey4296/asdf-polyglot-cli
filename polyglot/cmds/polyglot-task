@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
-# polyglot-tool -*- mode: sh -*-
+# polyglot-task -*- mode: sh -*-
 #set -o errexit
 set -o nounset
 set -o pipefail
 
 source "$POLY_SRC/lib/lib-util.bash"
 source "$POLY_SRC/lib/lib-hooks.bash"
+
+header "polyglot task"
 
 function print-help () {
     case "${@: -1}" in
@@ -15,12 +17,9 @@ function print-help () {
            fi
            ;;
     esac
-    echo -e "tool help"
+    echo -e " task help : "
     exit 2
 }
 
-
-header "polyglot tool"
-
 print-help "$@"
-run-subcmd "$POLYGLOT_ROOT/.tasks" "tool-" "$@"
+run-task "$POLYGLOT_ROOT/.tasks" "task-" "$@"

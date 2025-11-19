@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-#  polyglot-deactivate -*- mode: sh -*-
-
-if [[ -e "$PWD/.active" ]]; then
-    echo "Deactivating $PWD"
-    rm "$PWD/.active"
-else
-    echo "Directory not active anyway"
-fi

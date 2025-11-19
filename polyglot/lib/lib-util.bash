@@ -8,58 +8,30 @@ function debug () {
 }
 
 function fail () {
-    echo "Failed: $*"
+    echo -e "Failed: ${*}"
     exit 1
 }
 
 function header () {
-    echo "-------------------------"
-    echo "* $1"
-    echo "-------------------------"
+    echo -e "|-------------------------\n| * ${*}\n|-------------------------"
 }
 
 function subhead () {
-    echo "---------- $1"
+    echo -e "---------- ${*}"
 }
 
 function tdot () {
-    echo "... $1"
+    echo -e "... ${*}"
 }
 
 function sep () {
     echo "-------------------------"
 }
 
-function get_activated () {
-    # Get all activated subprojects
-    fdfind --base-directory "${POLYGLOT_ROOT}" --hidden "\.active" "./src" --exec dirname
-
+function is-help-flag () {
+    case "$1" in
+        -h|--help) return 1 ;;
+        *) return 0 ;;
+    esac
 }
 
-function source_dir () {
-    shopt -s globstar
-    for key in "$POLY_SRC/sub/"*.bash;
-    do
-        case "$key" in
-            *)
-                source "$key"
-                ;;
-        esac
-    done
-
-}
-
-function tasks_path () {
-    # Return the PATH augmented with the projects .tasks dir
-    fail "TODO"
-}
-
-function langs_path () {
-    # return the PATH augmented with the projects .tasks/lang-$1 dir
-    fail "TODO"
-}
-
-function tools_path () {
-    # return the PATH augmented with the projects .tasks/tool-$1 dir
-    fail "TODO"
-}

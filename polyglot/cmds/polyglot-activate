@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-#  polyglot-activate -*- mode: sh -*-
-
-echo "[polyglot] Activating $PWD"
-touch "$PWD/.active"

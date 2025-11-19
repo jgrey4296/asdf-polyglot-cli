@@ -2,124 +2,75 @@
 # polyglot -*- mode: sh -*-
 # Main script for polyglot projects, to hook into cargo.
 # polyglot is aliased as 'pg_' in places
+#set -o errexit
+set -o nounset
+set -o pipefail
 
 POLYGLOT_VERSION="0.1.0"
 
-current_script_path="${BASH_SOURCE[0]}"
+current_script_path=$(realpath "${BASH_SOURCE[0]}")
 POLY_SRC=$(realpath "$(dirname "$current_script_path")")
 if [[ -z "$POLYGLOT_ROOT" ]]; then
     echo "(Polyglot $POLYGLOT_VERSION): Make sure theres a POLYGLOT_ROOT env var"
     exit 1
 fi
 
-source "$POLY_SRC/lib/lib-"*.bash
-source "$POLY_SRC/lang/lang-"*.bash
-source "$POLY_SRC/tool/tool-"*.bash
+# shellcheck disable=SC1090
+source "$POLY_SRC/lib/lib-util.bash"
+source "$POLY_SRC/lib/lib-hooks.bash"
 
 # General
-VERBOSE=0
-SRC_DIR="$POLYGLOT_ROOT/${POLYGLOT_SRC:-src}"
-TEMP_DIR="$POLYGLOT_ROOT/${POLYGLOT_TEMP:-.temp}"
-LOG_DIR="$TEMP_DIR/logs"
-DATA_DIR="$SRC_DIR/_data"
-ASDF_PLUGIN_LIST="$POLYGLOT_ROOT/.asdf.plugins"
+VERBOSE=${VERBOSE:-0}
+LOCAL_SRC="$POLYGLOT_ROOT/${POLYGLOT_SRC:-src}"
+LOCAL_TEMP="$POLYGLOT_ROOT/${POLYGLOT_TEMP:-.temp}"
+LOCAL_TASKS="$POLYGLOT_ROOT/.tasks"
+LOCAL_LOG="$LOCAL_TEMP/logs"
+LOCAL_DATA="$LOCAL_SRC/_data"
 
-# Docs
-DOC_OUT="$TEMP_DIR/docs"
-SPHINX_BUILDER="${POLYGLOT_SPHINX_BUILDER:-html}"
-SPHINX_CONF_DIR="${POLYGLOT_SPHINX_CONF_DIR:-${SRC_DIR}/_sphinx}"
-SPHINX_OUT="$DOC_OUT/sphinx"
+if [[ "$1" = "polyglot" ]]; then
+    shift
+fi
+is-help-flag "${1:-}"
+is_help="$?"
+if [[ "$#" -eq 0 ]] || [[ "$is_help" -gt 0 ]]; then
+    # print help if you just call polyglot
+    # shellcheck disable=SC2098,SC2097
+    POLY_SRC="$POLY_SRC" "$POLY_SRC/cmds/polyglot-help"
+    exit 0
+fi
 
-# Tex
-TEX_USE_BIBTEX="${POLYGLOT_USE_BIBTEX:-1}"
-# shellcheck disable=SC2034
-TEX_PASSES=3
-TEX_OUT="$DOC_OUT/tex"
-TEX_TARGET=""
-TEX_TARGET_FILE=""
-TEX_TARGET_DIR=""
-TEX_LUA_FILE="$POLYGLOT_ROOT/init.tex.lua"
-# shellcheck disable=SC2034
-TEX_DEFAULT="main.tex"
+case "${@: -1}" in
+    -v|--version)
+        echo "$POLYGLOT_VERSION"
+        exit 0
+    ;;
+esac
 
-function polyglot_parse_args () {
-    if [[ "$1" = "polyglot" ]]; then
-        shift
-    fi
-    if [[ $# -eq 0  ]]; then
-        polyglot-help
-        exit
-    fi
 
-    case $1 in
-        -h|--help)
-            polyglot-help
-            exit
-            ;;
-        --version)
-            echo "$POLYGLOT_VERSION"
-            ;;
-        -v|--verbose)
-            VERBOSE=1
-            ;;
-        -t|--target)
-            echo "Target: $2"
-            ;;
-        --*=*)
-            echo "Assignment: $1"
-            ;;
-        # polyglot cmds
-        i|init)
-            shift
-            polyglot-init "$@"
-            ;;
-        u|update)
-            shift
-            polyglot-update "$@"
-            ;;
-        e|export)
-            shift
-            polyglot-export "$@"
-            ;;
-        a|activate)
-            shift
-            polyglot-activate "$@"
-            ;;
-        d|deactivate)
-            shift
-            polyglot-deactivate "$@"
-            ;;
-        list)
-            shift
-            polyglot-list "$@"
-            ;;
-        root)
-            echo "${POLYGLOT_ROOT}"
-            ;;
-        change)
-            shift
-            polyglot-change "$1"
-            ;;
-        release)
-            shift
-            polyglot-release "$@"
-            ;;
-        docs)
-            shift
-            polyglot-docs "$@"
-            ;;
-        tool)
-            shift
-            polyglot-tool "$@"
-            ;;
-        vars)
-            polyglot-envrc
-            ;;
-        *) # Positional
-            echo "Positional: $1"
-            ;;
-    esac
-}
+# Polyglot Internal:
+# polyglot {cmd}
+run-cmd "$POLY_SRC/cmds" "polyglot-" "$@"
+if [[ "$?" -ne 50 ]]; then
+    exit
+fi
 
-# get rid of the "polyglot" arg
-polyglot_parse_args "$@"
+# Project local:
+# polyglot lang {cmd}
+run-subcmd "$LOCAL_TASKS" "lang-" "$@"
+if [[ "$?" -ne 50 ]]; then
+   exit
+fi
+
+# polyglot tool {cmd}
+run-subcmd "$LOCAL_TASKS" "tool-" "$@"
+if [[ "$?" -ne 50 ]]; then
+   exit
+fi
+
+# polyglot task {task}
+run-task "$LOCAL_TASKS" "task-" "$@"
+if [[ "$?" -ne 50 ]]; then
+   exit
+fi
+
+fail "No Applicable Command or task found."

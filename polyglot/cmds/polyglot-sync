@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-#  polyglot-sync -*- mode: sh -*-
-
-echo "
-     TODO polyglot sync : sync workspace dependencies
-"
