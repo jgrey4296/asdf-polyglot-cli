@@ -36,8 +36,6 @@ function sort_versions() {
 }
 
 function list_all_versions() {
-	# TODO: Adapt this. By default we simply list the tag names from GitHub releases.
-	# Change this function if <YOUR TOOL> has other means of determining installable versions.
 	echo "0.1.0"
 }
 

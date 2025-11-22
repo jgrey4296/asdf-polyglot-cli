@@ -1,0 +1,15 @@
+version = "0.1.0"
+
+[[files]]
+file = "version.txt"
+expr = "(.+?)$"
+
+[[files]]
+file = "lib/utils.bash"
+expr = 'echo "(.+?)"$'
+
+[[files]]
+file = "polyglot/polyglot"
+expr = 'POLYGLOT_VERSION="(.+?)"$'
+
+[package]
