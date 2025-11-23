@@ -54,23 +54,4 @@ if [[ "$?" -ne 50 ]]; then
     exit
 fi
 
-# Project local:
-# polyglot lang {cmd}
-run-subcmd "$LOCAL_TASKS" "lang-" "$@"
-if [[ "$?" -ne 50 ]]; then
-   exit
-fi
-
-# polyglot tool {cmd}
-run-subcmd "$LOCAL_TASKS" "tool-" "$@"
-if [[ "$?" -ne 50 ]]; then
-   exit
-fi
-
-# polyglot task {task}
-run-task "$LOCAL_TASKS" "task-" "$@"
-if [[ "$?" -ne 50 ]]; then
-   exit
-fi
-
 fail "No Applicable Command or task found."

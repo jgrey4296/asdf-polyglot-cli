@@ -5,9 +5,6 @@ set -o nounset
 set -o pipefail
 
 source "$POLY_SRC/lib/lib-util.bash"
-source "$POLY_SRC/lib/lib-hooks.bash"
-
-header "polyglot task"
 
 function print-help () {
     case "${@: 1}" in
@@ -18,11 +15,152 @@ function print-help () {
            ;;
     esac
     echo -e "
-Call a specific registered task.
+usage: polyglot task [-h] [-l] [-hook=int] [target]
 
+Use a registered task.
+
+positional arguments:
+target
+
+options:
+-h, --help    : show this help message and exit
+-l, --list    : list the hooks of the target
+-d, --dry     : dry-run the hooks.
+--hook=int    : run just the nth hook of the target
 "
     exit 2
 }
 
+function run-task () {
+    # run-hooks {basedir} {task}
+    # task is of the form task-{}
+    local base="$1"
+    local prefix="$2"
+    local dry="$3"
+    local task="$4"
+    shift 4
+    local count=0
+    debug "- Checking for ${prefix/-/}: $task"
+    if [[ ! -d "$base/$prefix$task" ]]; then
+        return "$NOTHING"
+    fi
+    debug "- Running $task (dry=$dry)"
+
+    for hook in $(find "$base/$prefix$task" -executable -a -type f | sort -V)
+    do
+        hname=$( basename "$hook" )
+        if [[ "$dry" -gt 0 ]]; then
+            subhead "(dry) $hname ${*}"
+        else
+            (
+                POLY_SRC="$POLY_SRC" \
+                HOOK_NUM="$count" \
+                    "$hook" "$@"
+            )
+        fi
+        case "$?" in
+            0) # Normal hook completion
+                debug "- Hook Success"
+            ;;
+            1) # Hook Failed
+                fail "$(basename "$hook")"
+            ;;
+            2) # Hook Printed Help
+                return 0
+            ;;
+            *) # Unknown result
+                fail "Unknown Result: ($?) : $task/""$(basename "$hook")"
+            ;;
+        esac
+        count=$(( 1 + count ))
+        echo ""
+    done
+
+    header "Finished: $task. ($count) hooks ran."
+    return 0
+}
+
+function list-hooks () {
+    local base="$1"
+    local prefix="$2"
+    local task="$3"
+    shift 3
+    local count=0
+    echo "Active Hooks for $task: "
+    for hook in $(find "$base/$prefix$task" -executable -a -type f | sort -V)
+    do
+        hname=$( basename "$hook" )
+        echo -e "-($count): ${hname}"
+        count=$(( 1 + count ))
+    done
+    exit 0
+}
+
+function run-nth-hook () {
+    local base="$1"
+    local prefix="$2"
+    local nth="$3"
+    local task="$4"
+    shift 4
+    local count=0
+    echo -e "Running hook ($nth) with ($#) args: ${*} "
+
+    for hook in $(find "$base/$prefix$task" -executable -a -type f | sort -V)
+    do
+        hname=$( basename "$hook" )
+        if [[ "$nth" = "$count" ]]; then
+            subhead "Running hook $count: $hname"
+            (
+                POLY_SRC="$POLY_SRC" \
+                    HOOK_NUM="$count" \
+                    "$hook" "$@"
+            )
+            subhead "Skipping remaining hooks"
+            exit 0
+        else
+            subhead "Skipping hook $count: $hname"
+            count=$(( 1 + count ))
+        fi
+    done
+    exit 0
+}
+
 print-help "$@"
-run-task "$POLYGLOT_ROOT/.tasks" "task-" "$@"
+DO_LIST=0
+DO_DRY=0
+NTH_HOOK=""
+TASK_ARGS=()
+TARGET=""
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -l|--list)
+            DO_LIST=1
+            ;;
+        -d|--dry)
+            DO_DRY=1
+            ;;
+        --hook=*)
+            IFS="=" read -ra KEYVAL <<< "$1"
+            NTH_HOOK="${KEYVAL[1]}"
+            ;;
+        *) # Positional
+            TARGET="$1"
+            shift
+            TASK_ARGS=("$@")
+            break
+            ;;
+    esac
+    shift
+done
+
+header "polyglot task"
+
+if [[ "$DO_LIST" = 1 ]]; then
+    list-hooks "$POLYGLOT_ROOT/.tasks" "task-" "$TARGET"
+fi
+
+if [[ -n "${NTH_HOOK:-}" ]]; then
+    run-nth-hook "$POLYGLOT_ROOT/.tasks" "task-" "${NTH_HOOK}" "${TASK_ARGS[@]}"
+else
+    run-task "$POLYGLOT_ROOT/.tasks" "task-" "$DO_DRY" "${TASK_ARGS[@]}"
+fi

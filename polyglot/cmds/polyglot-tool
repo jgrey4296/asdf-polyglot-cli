@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 # polyglot-tool -*- mode: sh -*-
-#set -o errexit
+# set -o errexit
 set -o nounset
 set -o pipefail
 
 source "$POLY_SRC/lib/lib-util.bash"
-source "$POLY_SRC/lib/lib-hooks.bash"
 
 function print-help () {
     case "${@: 1}" in
@@ -16,13 +15,106 @@ function print-help () {
            ;;
     esac
     echo -e "
-Run a registered tool cmd.
+usage: polyglot tool [-h] [-l] [toolname subcmd]
+
+Use a registered tool's subcommand.
+
+positional arguments:
+toolname
+subcmd
+
+options:
+-h, --help     :  show this help message and exit
+-l, --list     :  list the available subcmds of the tool
 
 "
     exit 2
 }
 
+function list-subcmds () {
+    local base="$1"
+    local prefix="$2"
+    local tool="$3"
+    shift 3
+    local count=0
+    if [[ -z "$tool" ]]; then
+        fail "No Tool Specified to list subcmds of"
+    elif [[ ! -d "$base/$prefix$tool" ]]; then
+        fail "Tool could not be found: $tool"
+    fi
 
-header "polyglot tool"
+    echo -e "Active Subcommands for $tool: "
+    for subcmd in $(find "$base/$prefix$tool" -executable -a -type f | sort -V)
+    do
+        bname=$( basename "$subcmd" )
+        echo -e "-($count): ${bname}"
+        count=$(( 1 + count ))
+    done
+    exit 0
+}
+
+function run-subcmd () {
+    # run-subcmd {basedir} {subcmd} {args}
+    # task is of the form lang-{sub} or tool-{sub}
+    local base="$1"
+    local prefix="$2"
+    local tool="${3:-}"
+    local target="${4:-}"
+    shift 3
+    local count=0
+    if [[ -z "$target" ]]; then
+        fail "No Applicable tool subcommand specified"
+    fi
+    debug "- Checking for subcommand ${prefix}$tool: $target"
+    if [[ ! -d "$base/$prefix$tool" ]]; then
+        fail "No Applicable Tool Found: ${tool}"
+    fi
+
+    local possible
+    readarray -d '' possible < <(find "$base/${prefix}${tool}" -name "${target}*" -a -executable -print0)
+    if [[ "${#possible[@]}" -lt 0 ]]; then
+        fail "No Possible Subcmds Found"
+    elif [[ "${#possible[@]}" -gt 1 ]]; then
+        fail "Too Many Possible Subcmds Found: ${#possible[@]}"
+    fi
+
+    sub="${possible[0]}"
+    if [[ -x "$sub" ]]; then
+        POLY_SRC="$POLY_SRC" "$sub" "$@"
+        echo "Result: $?"
+        return
+    else
+        echo "not executable"
+    fi
+    return "$NOTHING"
+}
+
 print-help "$@"
-run-subcmd "$POLYGLOT_ROOT/.tasks" "tool-" "$@"
+DO_LIST=0
+TOOL=""
+SUBCMD=""
+TOOL_ARGS=()
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -l|--list)
+            DO_LIST=1
+            ;;
+        *) # Positional
+            if [[ -z "$TOOL" ]]; then
+                TOOL="$1"
+            elif [[ -z "$SUBCMD" ]]; then
+                SUBCMD="$1"
+                shift
+                TOOL_ARGS=("${@}")
+                break
+            fi
+            ;;
+    esac
+    shift
+done
+
+header "polyglot tool: $TOOL.$SUBCMD :(${#TOOL_ARGS[@]}) ${TOOL_ARGS[*]}"
+if [[ "$DO_LIST" = 1 ]]; then
+    list-subcmds "$POLYGLOT_ROOT/.tasks" "tool-" "$TOOL"
+fi
+run-subcmd "$POLYGLOT_ROOT/.tasks" "tool-" "$TOOL" "$SUBCMD" "${TOOL_ARGS[@]}"
