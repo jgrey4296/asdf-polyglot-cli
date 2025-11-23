@@ -11,7 +11,7 @@ case "$?" in
 
 A Help command for the registered langauge {template}
 "
-        exit 2
+        exit "$PRINTED_HELP"
     ;;
     *) ;;
 esac

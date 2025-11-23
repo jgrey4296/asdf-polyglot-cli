@@ -4,6 +4,7 @@
 set -o nounset
 set -o pipefail
 
+# shellcheck disable=SC1091
 source "$POLY_SRC/lib/lib-util.bash"
 
 function print-help () {
@@ -28,7 +29,7 @@ options:
 -l, --list     :  list the available subcmds of the tool
 
 "
-    exit 2
+    exit "$PRINTED_HELP"
 }
 
 function list-subcmds () {

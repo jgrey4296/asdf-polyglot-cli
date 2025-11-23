@@ -28,7 +28,7 @@ options:
 -d, --dry     : dry-run the hooks.
 --hook=int    : run just the nth hook of the target
 "
-    exit 2
+    exit "$PRINTED_HELP"
 }
 
 function run-task () {

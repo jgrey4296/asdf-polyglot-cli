@@ -7,7 +7,7 @@ set -o pipefail
 source "$POLY_SRC/lib/lib-util.bash"
 
 function print-help () {
-    case "${@: -1}" in
+    case "${@: 1}" in
         -h|--help) ;;
         *) if [[ "$#" -gt 0 ]]; then
                return
@@ -15,21 +15,23 @@ function print-help () {
            ;;
     esac
     echo -e "
+usage: polyglot stub [-h] [type]
+
 A utility to easily stub:
 - task hooks,
 - language cmds,
 - tool cmds
 - envrc additions
 
+positional arguments:
+type
+
+options:
+-h, --help    : show this help message and exit
+
 "
-    exit 2
+    exit "$PRINTED_HELP"
 }
-
-header "polyglot stub"
-print-help "$@"
-
-echo "TODO: stub"
-
 
 function print-hook-help-stub () {
     echo -e '
@@ -37,11 +39,14 @@ function print-hook-help-stub () {
 set -o nounset
 set -o pipefail
 
+# shellcheck disable=SC1091
+source "$POLY_SRC/lib/lib-util.bash"
+
 case "${@: -1}" in
     -h|--help)
     # hook help:
 
-    exit 2 ;;
+    exit "$PRINTED_HELP" ;;
     *) ;;
 esac
 '
@@ -106,3 +111,10 @@ export POLYGLOT_SPHINX_CONF_DIR=\"\$POLYGLOT_SRC/_sphinx\"
 export POLYGLOT_USE_BIBTEX=1
 # --"
 }
+
+print-help "$@"
+header "polyglot stub"
+
+echo "TODO: stub"
+
+

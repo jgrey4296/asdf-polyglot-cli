@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Utilities for polyglot
 NOTHING=50
+PRINTED_HELP=2
 
 function debug () {
     if [ "${VERBOSE:-0}" -eq 1 ]; then

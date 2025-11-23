@@ -20,7 +20,7 @@ where arg = [task, lang, tool]
 
 List available tasks, languages, and tools.
 "
-    exit 2
+    exit "$PRINTED_HELP"
 }
 
 print-help "$@"
