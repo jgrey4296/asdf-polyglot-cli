@@ -50,7 +50,7 @@ esac
 # Polyglot Internal:
 # polyglot {cmd}
 run-cmd "$POLY_SRC/cmds" "polyglot-" "$@"
-if [[ "$?" -ne 50 ]]; then
+if [[ "$?" -ne "$NOTHING" ]]; then
     exit
 fi
 

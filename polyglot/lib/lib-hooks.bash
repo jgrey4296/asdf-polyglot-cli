@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-# TODO dry-run flag
 function run-cmd () {
     # run-cmd {basedir} {subcmd}
     # task is of the form lang-{sub} or tool-{sub}
@@ -11,7 +10,7 @@ function run-cmd () {
     local count=0
     debug "- Checking for command ${prefix/-/}: $task"
     if [[ ! -x "$base/$prefix$task" ]] && [[ ! -d "$base/$prefix$task" ]]; then
-        return $NOTHING
+        return "$NOTHING"
     fi
 
     if [[ -d "$base/$prefix$task" ]]; then
@@ -23,7 +22,7 @@ function run-cmd () {
         POLY_SRC="$POLY_SRC" "$base/$prefix$task" "$@"
         return
     fi
-    return $NOTHING
+    return "$NOTHING"
 }
 
 function run-subcmd () {
@@ -36,12 +35,12 @@ function run-subcmd () {
     shift 3
     local count=0
     if [[ -z "$target" ]]; then
-        return $NOTHING
+        return "$NOTHING"
     fi
 
     debug "- Checking for subcommand ${prefix}$task: $target"
     if [[ ! -d "$base/$prefix$task" ]]; then
-        return $NOTHING
+        return "$NOTHING"
     fi
 
     local possible
@@ -59,5 +58,5 @@ function run-subcmd () {
             return
         fi
     done
-    return $NOTHING
+    return "$NOTHING"
 }
