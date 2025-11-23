@@ -14,7 +14,14 @@ function print-help () {
            fi
            ;;
     esac
-    echo -e "stub help "
+    echo -e "
+A utility to easily stub:
+- task hooks,
+- language cmds,
+- tool cmds
+- envrc additions
+
+"
     exit 2
 }
 

@@ -7,14 +7,19 @@ set -o pipefail
 source "$POLY_SRC/lib/lib-util.bash"
 
 function print-help () {
-    case "${@: -1}" in
+    case "${@: 1}" in
         -h|--help) ;;
         *) if [[ "$#" -gt 0 ]]; then
                return
            fi
            ;;
     esac
-    echo -e "list help"
+    echo -e "polyglot list [arg]
+
+where arg = [task, lang, tool]
+
+List available tasks, languages, and tools.
+"
     exit 2
 }
 

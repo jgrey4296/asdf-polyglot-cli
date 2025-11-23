@@ -1,0 +1,35 @@
+#  Docgen --------------------------------------------------
+
+[polyglot.docgen.mdbook]
+suffixes  = ["book.toml"]
+config    = []
+active    = []
+dirs      = ["_book"]
+
+[polyglot.docgen.sphinx]
+suffixes  = [".rst"]
+config    = ["src/_sphinx/conf.py"]
+dirs      = ["_sphinx"]
+active    = []
+
+[polyglot.docgen.docfx]
+suffixes  = [".md", ".yml"]
+config    = ["docfx.json"]
+dirs      = ["_docfx"]
+active    = []
+
+[polyglot.docgen.tex]
+suffixes  = [".tex", ".bib", ".lua"]
+config    = ["init.tex.lua", "tex.reqs"]
+dirs      = ["_tex"]
+active    = []
+
+[polyglot.docgen.changelog]
+suffixes  = []
+config    = ["towncrier.toml"]
+files     = ["CHANGELOG.md"]
+dirs      = ["_changes"]
+active    = []
+
+[polyglot.docgen.readthedocs]
+config = [".reaadthedocs.yaml"]

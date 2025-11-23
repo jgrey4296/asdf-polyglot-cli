@@ -10,14 +10,17 @@ source "$POLY_SRC/lib/lib-hooks.bash"
 header "polyglot task"
 
 function print-help () {
-    case "${@: -1}" in
+    case "${@: 1}" in
         -h|--help) ;;
         *) if [[ "$#" -gt 0 ]]; then
                return
            fi
            ;;
     esac
-    echo -e " task help : "
+    echo -e "
+Call a specific registered task.
+
+"
     exit 2
 }
 

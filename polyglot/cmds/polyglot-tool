@@ -8,19 +8,21 @@ source "$POLY_SRC/lib/lib-util.bash"
 source "$POLY_SRC/lib/lib-hooks.bash"
 
 function print-help () {
-    case "${@: -1}" in
+    case "${@: 1}" in
         -h|--help) ;;
         *) if [[ "$#" -gt 0 ]]; then
                return
            fi
            ;;
     esac
-    echo -e "tool help"
+    echo -e "
+Run a registered tool cmd.
+
+"
     exit 2
 }
 
 
 header "polyglot tool"
-
 print-help "$@"
 run-subcmd "$POLYGLOT_ROOT/.tasks" "tool-" "$@"

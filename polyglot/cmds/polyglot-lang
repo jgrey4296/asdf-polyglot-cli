@@ -10,14 +10,16 @@ source "$POLY_SRC/lib/lib-hooks.bash"
 header "polyglot lang"
 
 function print-help () {
-    case "${@: -1}" in
+    case "${@: 1}" in
         -h|--help) ;;
         *) if [[ "$#" -gt 0 ]]; then
                return
            fi
            ;;
     esac
-    echo -e "lang help"
+    echo -e "
+Run a registered language cmd.
+"
     exit 2
 }
 
