@@ -14,6 +14,7 @@
 
 set -euo pipefail
 
+POLYGLOT_VERSION="0.1.0"
 GH_REPO="https://github.com/jgrey4294/asdf-polyglot-cli.git"
 TOOL_NAME="polyglot"
 TOOL_TEST="polyglot --help"
@@ -36,7 +37,7 @@ function sort_versions() {
 }
 
 function list_all_versions() {
-	echo "0.1.0"
+	echo "$POLYGLOT_VERSION"
 }
 
 function install_version() {

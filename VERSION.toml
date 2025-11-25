@@ -1,15 +1,15 @@
 version = "0.1.0"
 
 [[files]]
-file = "version.txt"
-expr = "(.+?)$"
+  file = "version.txt"
+  expr = "(.+?)$"
 
 [[files]]
-file = "lib/utils.bash"
-expr = 'echo "(.+?)"$'
+  file = "lib/utils.bash"
+  expr = 'POLYGLOT_VERSION="(.+?)"$'
 
 [[files]]
-file = "polyglot/polyglot"
-expr = 'POLYGLOT_VERSION="(.+?)"$'
+  file = "polyglot/polyglot"
+  expr = 'POLYGLOT_VERSION="(.+?)"$'
 
 [package]
