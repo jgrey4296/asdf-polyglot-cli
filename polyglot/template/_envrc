@@ -1,0 +1,16 @@
+##-- polyglot
+# Polyglot Environment Variables for .envrc
+export POLYGLOT_ROOT="$PWD"
+export POLYGLOT_PROJ_SRC="$PWD/src"
+export POLYGLOT_SRC="$PWD/src"
+export POLYGLOT_TEMP="$PWD/.temp"
+export POLYGLOT_SEED="23523"
+
+# Sphinx documentation:
+export POLYGLOT_SPHINX_BUILDER="bibhtml"
+export POLYGLOT_SPHINX_CONF_DIR="$PWD/src/_sphinx"
+
+# For task-local python utilities:
+# export PYTHONPATH="$PWD/.tasks:$PYTHONPATH"
+##-- end polyglot
+

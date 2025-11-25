@@ -31,6 +31,7 @@ function sep () {
 }
 
 function is-help-flag () {
+    # returns 1 if --help or -h is passed in
     case "$1" in
         -h|--help) return 1 ;;
         *) return 0 ;;

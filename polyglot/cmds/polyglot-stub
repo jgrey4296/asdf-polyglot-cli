@@ -7,6 +7,8 @@ set -o pipefail
 # shellcheck disable=SC1091
 source "$POLY_SRC/lib/lib-util.bash"
 
+TEMPLATES="$POLY_SRC/template"
+
 function print-help () {
     case "${@: 1}" in
         -h|--help) ;;
@@ -34,122 +36,23 @@ options:
 }
 
 function print-task-hook-stub () {
-    # shellcheck disable=SC2016
-    echo -e '#!/usr/bin/env bash
-# Stub shell script for a task hook.
-# Place in $root/.tasks/task-{name}/[0-9].{desc}.bash
-# then make it executable with chmod +x
-set -o nounset
-set -o pipefail
-
-# shellcheck disable=SC1091
-source "$POLY_SRC/lib/lib-util.bash"
-
-fname=$(basename "${BASH_SOURCE[0]}")
-header "($HOOK_NUM): $fname.\n* Args: " "$@"
-
-# Parse args:
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        -t|--target)
-            echo "Target: $2"
-            ;;
-        --bloo=*)
-            echo "Assignment: $1"
-            IFS="=" read -ra KEYVAL <<< "$1"
-            echo "Key: ${KEYVAL[0]/--/}"
-            echo "Val: ${KEYVAL[1]}"
-            ;;
-        *) # Positional
-            echo "Positional: $1"
-            ;;
-    esac
-    shift
-done
-
-echo "TODO: hook implementation"
-
-# Return Codes:
-# - 0 : success
-# - 1 : failure
-# - 2 : help printed
-'
+    cat "$TEMPLATES/task-template/_hook"
 }
 
 function print-hook-help-stub () {
-    # shellcheck disable=SC2016
-    echo -e '#!/usr/bin/env bash
-# place in $root/.tasks/task-{name}/0.help.bash
-# and chmod +x it.
-set -o nounset
-set -o pipefail
-
-# shellcheck disable=SC1091
-source "$POLY_SRC/lib/lib-util.bash"
-
-case "${@: -1}" in
-    -h|--help)
-    # hook help:
-
-    exit "$PRINTED_HELP" ;;
-    *) ;;
-esac
-'
+    cat "$TEMPLATES/task-template/_help"
 }
 
 function print-lang-cmd-stub () {
-    # shellcheck disable=SC2016
-    echo -e '#!/usr/bin/env bash
-# A Stub language command.
-# Place in $root/.tasks/lang-{name}/{cmd}.bash
-# and chmod +x it.
-set -o nounset
-set -o pipefail
-
-# shellcheck disable=SC1091
-source "$POLY_SRC/lib/lib-util.bash"
-
-echo "TODO: language command."
-'
+    cat "$TEMPLATES/lang-template/_cmd"
 }
 
 function print-tool-cmd-stub () {
-    # shellcheck disable=SC2016
-    echo -e '#!/usr/bin/env bash
-# A Stub tool command.
-# Place in $root/.tasks/tool-{name}/{cmd}.bash
-# and chmod +x it.
-set -o nounset
-set -o pipefail
-
-# shellcheck disable=SC1091
-source "$POLY_SRC/lib/lib-util.bash"
-
-echo "TODO: tool command."
-'
+    cat "$TEMPLATES/tool-template/_cmd"
 }
 
 function print-envrc-stub () {
-    # shellcheck disable=SC2016
-    echo '# -- Standard Polyglot Environment Variables for .envrc
-
-# For adding task-local utilities:
-# export PYTHONPATH="$PWD/.tasks:$PYTHONPATH"
-
-# The root of the project:
-export POLYGLOT_ROOT="$PWD"
-
-# Where package sources are located:
-export POLYGLOT_SRC="src"
-
-# A directory to build temporary files, able to be deleted without worry:
-export POLYGLOT_TEMP=".temp"
-
-# Sphinx documentation:
-export POLYGLOT_SPHINX_BUILDER="html"
-export POLYGLOT_SPHINX_CONF_DIR="$POLYGLOT_SRC/_sphinx"
-export POLYGLOT_USE_BIBTEX=1
-# --'
+    cat "$TEMPLATES/_envrc"
 }
 
 print-help "$@"

@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# place in $root/.tasks/task-{name}/0.help.bash
+# and chmod +x it.
+set -o nounset
+set -o pipefail
+
+# shellcheck disable=SC1091
+source "$POLY_SRC/lib/lib-util.bash"
+if [[ -e "$POLYGLOT_ROOT/.tasks/task-util.bash" ]]; then
+    source "$POLYGLOT_ROOT/.tasks/task-util.bash"
+fi
+
+case "${@: -1}" in
+    -h|--help)
+    # hook help:
+
+    exit "$PRINTED_HELP" ;;
+    *) ;;
+esac
