@@ -32,7 +32,7 @@ options:
 }
 
 function run-task () {
-    # run-hooks {basedir} {task}
+    # run-hooks {basedir} {prefix} {dry} {task}
     # task is of the form task-{}
     local base="$1"
     local prefix="$2"
@@ -160,7 +160,7 @@ if [[ "$DO_LIST" = 1 ]]; then
 fi
 
 if [[ -n "${NTH_HOOK:-}" ]]; then
-    run-nth-hook "$POLYGLOT_ROOT/.tasks" "task-" "${NTH_HOOK}" "${TASK_ARGS[@]}"
+    run-nth-hook "$POLYGLOT_ROOT/.tasks" "task-" "${NTH_HOOK}" "$TARGET" "${TASK_ARGS[@]}"
 else
-    run-task "$POLYGLOT_ROOT/.tasks" "task-" "$DO_DRY" "${TASK_ARGS[@]}"
+    run-task     "$POLYGLOT_ROOT/.tasks" "task-" "$DO_DRY" "$TARGET" "${TASK_ARGS[@]}"
 fi
