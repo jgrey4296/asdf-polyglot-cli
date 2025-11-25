@@ -17,3 +17,7 @@ mkdir -pp "$ASDF_INSTALL_PATH/bin"
 
 # just move the copied polyglot scripts into install dir
 cp -r "${ASDF_DOWNLOAD_PATH}"/polyglot/* "$ASDF_INSTALL_PATH/bin"
+
+chmod +x "${ASDF_INSTALL_PATH}/bin/polyglot"
+chmod +x "${ASDF_INSTALL_PATH}/bin/cargo-pg"
+chmod +x "${ASDF_INSTALL_PATH}/bin/cargo-polyglot"
