@@ -2,14 +2,14 @@ version = "0.2.0"
 
 [[files]]
 file = "version.txt"
-expr = "(.+?)$"
+expr = "(.+)"
 
 [[files]]
 file = "lib/utils.bash"
-expr = 'POLYGLOT_VERSION="(.+?)"$'
+expr = 'POLYGLOT_VERSION="(.+)"'
 
 [[files]]
 file = "polyglot/polyglot"
-expr = 'POLYGLOT_VERSION="(.+?)"$'
+expr = 'POLYGLOT_VERSION="(.+)"'
 
 [package]
