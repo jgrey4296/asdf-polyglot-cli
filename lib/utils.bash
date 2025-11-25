@@ -14,7 +14,7 @@
 
 set -euo pipefail
 
-POLYGLOT_VERSION="0.1.0"
+POLYGLOT_VERSION="0.2.0"
 GH_REPO="https://github.com/jgrey4294/asdf-polyglot-cli.git"
 TOOL_NAME="polyglot"
 TOOL_TEST="polyglot --help"

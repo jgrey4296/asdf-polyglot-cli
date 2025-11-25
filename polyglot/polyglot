@@ -6,7 +6,7 @@
 set -o nounset
 set -o pipefail
 
-POLYGLOT_VERSION="0.1.0"
+POLYGLOT_VERSION="0.2.0"
 
 current_script_path=$(realpath "${BASH_SOURCE[0]}")
 POLY_SRC=$(realpath "$(dirname "$current_script_path")")
