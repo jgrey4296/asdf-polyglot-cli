@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+#  polyglot-help -*- mode: sh -*-
+
+# shellcheck disable=SC1091
+source "$POLY_SRC/lib/lib-util.bash"
+
+header "Polyglot ${POLYGLOT_VERSION}\n|   An access point for polyglot project management."
+
+echo -e "\nAvailable Polyglot cmds:"
+for task in $(find "$POLY_SRC/cmds" -executable -a -type f | sort -V)
+do
+    cmdname=$(basename "$task")
+    echo "- ${cmdname/polyglot-/}"
+done
+
+echo "- list [langs | tools | tasks]"

@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+#  polyglot-lang -*- mode: sh -*-
+#set -o errexit
+set -o nounset
+set -o pipefail
+
+source "$POLY_SRC/lib/lib-util.bash"
+
+function print-help () {
+    case "${@: 1}" in
+        -h|--help) ;;
+        *) if [[ "$#" -gt 0 ]]; then
+               return
+           fi
+           ;;
+    esac
+    echo -e "
+usage: polyglot lang [-h] [-l] [langname subcmd]
+
+Use a registered language's subcommand.
+
+positional arguments:
+langname
+subcmd
+
+options:
+-h, --help     :  show this help message and exit
+-l, --list     :  list the available subcmds of the language
+"
+    exit "$PRINTED_HELP"
+}
+
+function list-subcmds () {
+    local base="$1"
+    local prefix="$2"
+    local lang="$3"
+    shift 3
+    local count=0
+    if [[ -z "$lang" ]]; then
+        fail "No language Specified to list subcmds of"
+    elif [[ ! -d "$base/$prefix$lang" ]]; then
+        fail "Language could not be found: $lang"
+    fi
+
+    echo -e "Active Subcommands for $lang: "
+    for subcmd in $(find "$base/$prefix$lang" -executable -a -type f | sort -V)
+    do
+        bname=$( basename "$subcmd" )
+        echo -e "-($count): ${bname}"
+        count=$(( 1 + count ))
+    done
+    exit 0
+}
+
+function run-subcmd () {
+    # run-subcmd {basedir} {subcmd} {args}
+    # task is of the form lang-{sub} or lang-{sub}
+    local base="$1"
+    local prefix="$2"
+    local lang="${3:-}"
+    local target="${4:-}"
+    shift 3
+    local count=0
+    if [[ -z "$target" ]]; then
+        fail "No Applicable language subcommand specified"
+    fi
+    debug "- Checking for subcommand ${prefix}$lang: $target"
+    if [[ ! -d "$base/$prefix$lang" ]]; then
+        fail "No Applicable lang Found: ${lang}"
+    fi
+
+    local possible
+    readarray -d '' possible < <(find "$base/${prefix}${lang}" -name "${target}*" -a -executable -print0)
+    if [[ "${#possible[@]}" -lt 1 ]]; then
+        fail "No Possible Subcmds Found"
+    elif [[ "${#possible[@]}" -gt 1 ]]; then
+        fail "Too Many Possible Subcmds Found: ${#possible[@]}"
+    fi
+
+    sub="${possible[0]}"
+    if [[ -x "$sub" ]]; then
+        POLY_SRC="$POLY_SRC" "$sub" "$@"
+        echo "Result: $?"
+        return
+    else
+        echo "not executable"
+    fi
+    return "$NOTHING"
+}
+
+print-help "$@"
+DO_LIST=0
+TARGET_LANG=""
+SUBCMD=""
+LANG_ARGS=()
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -l|--list)
+            DO_LIST=1
+            ;;
+        *) # Positional
+            if [[ -z "$TARGET_LANG" ]]; then
+                TARGET_LANG="$1"
+            elif [[ -z "$SUBCMD" ]]; then
+                SUBCMD="$1"
+                shift
+                LANG_ARGS=("${@}")
+                break
+            fi
+            ;;
+    esac
+    shift
+done
+
+header "polyglot lang: $TARGET_LANG.$SUBCMD :(${#LANG_ARGS[@]}) ${LANG_ARGS[*]}"
+if [[ "$DO_LIST" = 1 ]]; then
+    list-subcmds "$POLYGLOT_ROOT/.tasks" "lang-" "$TARGET_LANG"
+fi
+run-subcmd "$POLYGLOT_ROOT/.tasks" "lang-" "$TARGET_LANG" "$SUBCMD" "${LANG_ARGS[@]}"

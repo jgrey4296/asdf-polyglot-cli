@@ -2,185 +2,56 @@
 # polyglot -*- mode: sh -*-
 # Main script for polyglot projects, to hook into cargo.
 # polyglot is aliased as 'pg_' in places
+#set -o errexit
+set -o nounset
+set -o pipefail
 
 POLYGLOT_VERSION="0.1.0"
 
-current_script_path="${BASH_SOURCE[0]}"
+current_script_path=$(realpath "${BASH_SOURCE[0]}")
 POLY_SRC=$(realpath "$(dirname "$current_script_path")")
 if [[ -z "$POLYGLOT_ROOT" ]]; then
     echo "(Polyglot $POLYGLOT_VERSION): Make sure theres a POLYGLOT_ROOT env var"
     exit 1
 fi
 
-source "$POLY_SRC/lib-util.bash"
-source "$POLY_SRC/lib-install.bash"
-source "$POLY_SRC/lib-run.bash"
-source "$POLY_SRC/lib-docs.bash"
-source "$POLY_SRC/lib-update.bash"
+# shellcheck disable=SC1090
+source "$POLY_SRC/lib/lib-util.bash"
+source "$POLY_SRC/lib/lib-hooks.bash"
 
 # General
-VERBOSE=0
-SRC_DIR="$POLYGLOT_ROOT/${POLYGLOT_SRC:-src}"
-TEMP_DIR="$POLYGLOT_ROOT/${POLYGLOT_TEMP:-.temp}"
-LOG_DIR="$TEMP_DIR/logs"
-DATA_DIR="$SRC_DIR/_data"
-ASDF_PLUGIN_LIST="$POLYGLOT_ROOT/.asdf.plugins"
+VERBOSE=${VERBOSE:-0}
+LOCAL_SRC="$POLYGLOT_ROOT/${POLYGLOT_SRC:-src}"
+LOCAL_TEMP="$POLYGLOT_ROOT/${POLYGLOT_TEMP:-.temp}"
+LOCAL_TASKS="$POLYGLOT_ROOT/.tasks"
+LOCAL_LOG="$LOCAL_TEMP/logs"
+LOCAL_DATA="$LOCAL_SRC/_data"
 
-# Docs
-DOC_OUT="$TEMP_DIR/docs"
-SPHINX_BUILDER="${POLYGLOT_SPHINX_BUILDER:-html}"
-SPHINX_CONF_DIR="${POLYGLOT_SPHINX_CONF_DIR:-${SRC_DIR}/_sphinx}"
-SPHINX_OUT="$DOC_OUT/sphinx"
+if [[ "$1" = "polyglot" ]]; then
+    shift
+fi
+is-help-flag "${1:-}"
+is_help="$?"
+if [[ "$#" -eq 0 ]] || [[ "$is_help" -gt 0 ]]; then
+    # print help if you just call polyglot
+    # shellcheck disable=SC2098,SC2097
+    POLY_SRC="$POLY_SRC" "$POLY_SRC/cmds/polyglot-help"
+    exit 0
+fi
 
-# Tex
-TEX_USE_BIBTEX="${POLYGLOT_USE_BIBTEX:-1}"
-# shellcheck disable=SC2034
-TEX_PASSES=3
-TEX_OUT="$DOC_OUT/tex"
-TEX_TARGET=""
-TEX_TARGET_FILE=""
-TEX_TARGET_DIR=""
-TEX_LUA_FILE="$POLYGLOT_ROOT/init.tex.lua"
-# shellcheck disable=SC2034
-TEX_DEFAULT="main.tex"
+case "${@: -1}" in
+    -v|--version)
+        echo "$POLYGLOT_VERSION"
+        exit 0
+    ;;
+esac
 
-function pg_print_help () {
-    header "Polyglot ${POLYGLOT_VERSION} - an access point for polyglot project management."
-    echo -e "
-cargo polyglot [-v|--verbose] [subcmd] [args*] [-h | --help]
 
-SubCommands:
-- i | init        : initialise the polyglot project
-- e | export      : export additional dependencies (asdf plugins, tex packages list...)
+# Polyglot Internal:
+# polyglot {cmd}
+run-cmd "$POLY_SRC/cmds" "polyglot-" "$@"
+if [[ "$?" -ne "$NOTHING" ]]; then
+    exit
+fi
 
-- a | active      : set a directory as active
-- d | deactivate  : unset a directory from being active
-- list            : list activated directories
-- root            : print the root directory of the polyglot project
-
-- release         : run release scripts to bump version num and tag commit
-- docs            : build documentation (sphinx, mdbook, rustdoc...)
-- tex             : run a tex compilation
-- keystore        : setup an android keystore
-- dispy           : disassemble a python file to bytecode
-- vars            : echo out just the env vars for redirecting into .envrc
-- change          : create a change notification
-"
-    pg_stub_env_vars
-}
-
-function pg_stub_env_vars () {
-    echo "# -- Polyglot Environment Variables for .envrc"
-    echo "export POLYGLOT_ROOT=\"\$PWD\""
-    echo "export POLYGLOT_SRC=\"src\""
-    echo "export POLYGLOT_TEMP=\".temp\""
-    echo "export POLYGLOT_SPHINX_BUILDER=\"html\""
-    echo "export POLYGLOT_SPHINX_CONF_DIR=\"\$POLYGLOT_SRC/_sphinx\""
-    echo "export POLYGLOT_USE_BIBTEX=1"
-    echo "# --"
-
-}
-
-function polyglot_parse_args () {
-    if [[ "$1" = "polyglot" ]]; then
-        shift
-    fi
-    if [[ $# -eq 0  ]]; then
-        pg_print_help
-        exit
-    fi
-
-    case $1 in
-        -h|--help)
-            pg_print_help
-            exit
-            ;;
-        --version)
-            echo "$POLYGLOT_VERSION"
-            ;;
-        -v|--verbose)
-            VERBOSE=1
-            ;;
-        -t|--target)
-            echo "Target: $2"
-            ;;
-        --*=*)
-            echo "Assignment: $1"
-            ;;
-        # polyglot cmds
-        i|init)
-            init_polyglot
-            ;;
-        u|update)
-            update_polyglot
-            ;;
-        e|export)
-            shift
-            run_export "$@"
-            ;;
-        a|activate)
-            echo "[polyglot] Activating $PWD"
-            touch "$PWD/.active"
-            ;;
-        d|deactivate)
-            if [[ -e "$PWD/.active" ]]; then
-                echo "Deactivating $PWD"
-                rm "$PWD/.active"
-            else
-                echo "Directory not active anyway"
-            fi
-            ;;
-        list)
-            echo "Active Subprojects:"
-            for sub in $(get_activated)
-            do
-                echo "- ${sub}"
-            done
-            ;;
-        root)
-            echo "${POLYGLOT_ROOT}"
-            ;;
-        change)
-            shift
-            towncrier create --no-edit "+.${1:-feature}"
-            ;;
-        # subproject focused cmds
-        release)
-            shift
-            run_release "$@"
-            ;;
-        docs)
-            shift
-            pg_docs "$@"
-            ;;
-        tex)
-            shift
-            pg_tex "$@"
-            ;;
-        dispy)
-            shift
-            run_dispy "$@"
-            ;;
-        keystore)
-            shift
-            run_keystore "$@"
-            ;;
-        lint)
-            shift
-            run_lint "$@"
-            ;;
-        test)
-            shift
-            run_lint "$@"
-            ;;
-        vars)
-            pg_stub_env_vars
-            ;;
-        *) # Positional
-            echo "Positional: $1"
-            ;;
-    esac
-}
-
-# get rid of the "polyglot" arg
-polyglot_parse_args "$@"
+fail "No Applicable Command or task found."

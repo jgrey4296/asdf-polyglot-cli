@@ -13,38 +13,27 @@ While this cli tool is for manipulating it.
 
 To Use, add `export POLYGLOT_ROOT="$PWD"` to your .envrc.
 
-## Subcommands
+Polyglot also aliases as:
+- cargo-polyglot
+- cargo-pg
 
-### init
+## Commands
 
-### export
+- `help`
+- `list`
+- `stub`
+- `lang`
+- `tool`
+- `task`
 
-### active
 
-### deactivate
+## Registering language/tool/task commands
 
-### release
+`polyglot` looks in `$POLYGLOT_ROOT/.tasks` for directories of the form:
+- `lang-{name}`
+- `tool-{name}`
+- `task-{name}`.
 
-### docs
-
-### tex
-
-### keystore
-
-### dispy
-
-## Languages / build tool / documentation
-- python / uv / sphinx 
-- rust / cargo / rustdoc 
-- kotlin / gradle / dokka
-- agentspeak / jacamo / 
-- dotnet / dotnet / docfx
-- ansprolog / clingo / 
-- prolog / swi-prolog
-- rocq / make / rocq doc
-- supercollider / quarks 
-- lualatex / / 
-- emacs lisp / /
-- csound / /
-- inform / /
-- doxygen
+Executable scripts in language and tool directories are run with
+`polyglot {lang|tool} {name} [args...]`.
+Meanwhile tasks are run with `polyglot task {name} [args...]`, which runs *each* executable in the directory, sorted alphanumerically.
