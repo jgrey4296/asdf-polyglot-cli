@@ -23,7 +23,9 @@ function subhead () {
 }
 
 function tdot () {
-    echo -e "... ${*}"
+    head="$1"
+    shift
+    echo -e "$1 ... ${*}"
 }
 
 function sep () {
