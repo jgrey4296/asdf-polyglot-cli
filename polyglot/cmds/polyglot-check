@@ -50,6 +50,9 @@ print-help "$@"
 
 target="${1:-}"
 
+# TODO: if a tool/lang exists and has an is-active,
+# call and return that.
+
 case "$target" in
     tool-*|task-*|lang-*)
         [[ -d "$target" ]]
