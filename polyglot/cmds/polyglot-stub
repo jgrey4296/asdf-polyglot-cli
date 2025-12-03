@@ -35,22 +35,6 @@ options:
     exit "$PRINTED_HELP"
 }
 
-function print-task-hook-stub () {
-    cat "$TEMPLATES/task-template/_hook"
-}
-
-function print-hook-help-stub () {
-    cat "$TEMPLATES/task-template/_help"
-}
-
-function print-lang-cmd-stub () {
-    cat "$TEMPLATES/lang-template/_cmd"
-}
-
-function print-tool-cmd-stub () {
-    cat "$TEMPLATES/tool-template/_cmd"
-}
-
 function print-envrc-stub () {
     cat "$TEMPLATES/_envrc"
 }

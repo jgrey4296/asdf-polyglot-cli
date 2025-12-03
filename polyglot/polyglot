@@ -10,22 +10,26 @@ POLYGLOT_VERSION="0.2.0"
 
 current_script_path=$(realpath "${BASH_SOURCE[0]}")
 POLY_SRC=$(realpath "$(dirname "$current_script_path")")
-if [[ -z "$POLYGLOT_ROOT" ]]; then
-    echo "(Polyglot $POLYGLOT_VERSION): Make sure theres a POLYGLOT_ROOT env var"
-    exit 1
-fi
 
 # shellcheck disable=SC1090
 source "$POLY_SRC/lib/lib-util.bash"
 source "$POLY_SRC/lib/lib-hooks.bash"
 
+if [[ "$1" = "new" ]]; then
+    # early override for when you aren't in a workspace,
+    # and want one.
+    run-cmd "$POLY_SRC/cmds" "polyglot-" "$@"
+    exit "$?"
+fi
+
+if [[ -z "$POLYGLOT_ROOT" ]]; then
+    # if you think you're in a workspace, but aren't.
+    echo "(Polyglot $POLYGLOT_VERSION): Make sure theres a POLYGLOT_ROOT env var"
+    exit 1
+fi
+
 # General
 VERBOSE=${VERBOSE:-0}
-LOCAL_SRC="$POLYGLOT_ROOT/${POLYGLOT_SRC:-src}"
-LOCAL_TEMP="$POLYGLOT_ROOT/${POLYGLOT_TEMP:-.temp}"
-LOCAL_TASKS="$POLYGLOT_ROOT/.tasks"
-LOCAL_LOG="$LOCAL_TEMP/logs"
-LOCAL_DATA="$LOCAL_SRC/_data"
 
 if [[ "${1:-}" = "polyglot" ]]; then
     shift
@@ -45,7 +49,6 @@ case "${@: -1}" in
         exit 0
     ;;
 esac
-
 
 # Polyglot Internal:
 # polyglot {cmd}

@@ -1,4 +1,5 @@
-#  polyglot-check -*- mode: sh -*-
+#!/usr/bin/env -S bash
+#  polyglot-add -*- mode: sh -*-
 
 #set -o errexit
 set -o nounset

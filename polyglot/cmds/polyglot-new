@@ -1,5 +1,5 @@
 #!/usr/bin/env -S bash
-#  polyglot-check -*- mode: sh -*-
+#  polyglot-new -*- mode: sh -*-
 
 #set -o errexit
 set -o nounset
@@ -19,12 +19,12 @@ function print-help () {
            ;;
     esac
     echo -e "
-usage: polyglot check [-h] [arg]
+usage: polyglot new [-h]
 
-Checks that a task-arg, tool-arg, or lang-arg exists in .tasks
+Shortcut to create a new polyglot workspace.
+(using a cookiecutter abbreviation of 'polyglot')
 
 positional arguments:
-arg          : full name of task/tool/lang to test is loaded
 
 options:
 -h, --help    : show this help message and exit
@@ -49,19 +49,4 @@ function verbose-result () {
 
 print-help "$@"
 
-target="${1:-}"
-
-# TODO: if a tool/lang exists and has an is-active,
-# call and return that.
-
-case "$target" in
-    tool-*|task-*|lang-*)
-        [[ -d "$target" ]]
-            verbose-result "$?"
-        ;;
-    *)
-        fail "Bad format of check target. it should be one of [tool-{}, task-{}, lang-{}]"
-        ;;
-esac
-
-
+cookiecutter polyglot
