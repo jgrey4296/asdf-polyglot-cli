@@ -25,7 +25,7 @@ function subhead () {
 function tdot () {
     head="$1"
     shift
-    echo -e "$1 ... ${*}"
+    echo -e "$head ... ${*}"
 }
 
 function sep () {
