@@ -1,0 +1,74 @@
+#  polyglot-check -*- mode: sh -*-
+
+#set -o errexit
+set -o nounset
+set -o pipefail
+
+# shellcheck disable=SC1091
+source "$POLY_SRC/lib/lib-util.bash"
+
+function print-help () {
+    # test args, if the last one is -h or --help
+    # print help and exit
+    case "${@: -1}" in
+        -h|--help) ;;
+        *) if [[ "$#" -gt 0 ]]; then
+               return
+           fi
+           ;;
+    esac
+    echo -e "
+usage: polyglot add [-h] [type] [name]
+
+Add a task/tool/lang template into .tasks,
+using abbreviations set up in cookiecutterrc
+
+positional arguments:
+type : task|tool|lang|util
+name : the template name
+
+options:
+-h, --help    : show this help message and exit
+
+
+"
+    exit "${PRINTED_HELP:-2}"
+}
+
+function verbose-result () {
+    if [[ "${VERBOSE:-0}" -eq 0 ]]; then
+       exit "$1"
+    fi
+
+    if [[ "$1" -eq 0 ]]; then
+        echo "$target is loaded"
+    else
+        echo "$target is not loaded"
+    fi
+    exit "$1"
+}
+
+print-help "$@"
+
+type="$1"
+name="$2"
+
+case "$type" in
+    util)
+        subhead "Creating lang-$name"
+        pushd "$POLYGLOT_ROOT/.tasks" || fail "Failed to go to tasks dir"
+        cookiecutter "$type:$name"
+        popd || fail "Failed to return from tasks dir"
+        ;;
+    tool|task|lang)
+        subhead "Creating $type-$name"
+        pushd "$POLYGLOT_ROOT/.tasks" || fail "Failed to go to tasks dir"
+        cookiecutter "$type:$name"
+        popd || fail "Failed to return from tasks dir"
+        ;;
+    *)
+        fail "Bad type. It should be one of [tool, task, lang]"
+        ;;
+esac
+
+
