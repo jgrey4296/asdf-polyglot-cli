@@ -27,7 +27,7 @@ LOCAL_TASKS="$POLYGLOT_ROOT/.tasks"
 LOCAL_LOG="$LOCAL_TEMP/logs"
 LOCAL_DATA="$LOCAL_SRC/_data"
 
-if [[ "$1" = "polyglot" ]]; then
+if [[ "${1:-}" = "polyglot" ]]; then
     shift
 fi
 is-help-flag "${1:-}"
@@ -50,8 +50,9 @@ esac
 # Polyglot Internal:
 # polyglot {cmd}
 run-cmd "$POLY_SRC/cmds" "polyglot-" "$@"
-if [[ "$?" -ne "$NOTHING" ]]; then
-    exit
+result="$?"
+if [[ "$result" -ne "$NOTHING" ]]; then
+    exit "$result"
 fi
 
 fail "No Applicable Command or task found."

@@ -16,7 +16,7 @@ function print-help () {
     esac
     echo -e "polyglot list [arg]
 
-where arg = [task, lang, tool]
+where arg = [t|tasks, l|langs, o|tools]
 
 List available tasks, languages, and tools.
 "

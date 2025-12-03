@@ -1,0 +1,63 @@
+#  polyglot-check -*- mode: sh -*-
+
+#set -o errexit
+set -o nounset
+set -o pipefail
+
+# shellcheck disable=SC1091
+source "$POLY_SRC/lib/lib-util.bash"
+
+function print-help () {
+    # test args, if the last one is -h or --help
+    # print help and exit
+    case "${@: -1}" in
+        -h|--help) ;;
+        *) if [[ "$#" -gt 0 ]]; then
+               return
+           fi
+           ;;
+    esac
+    echo -e "
+usage: polyglot check [-h] [arg]
+
+Checks that a task-arg, tool-arg, or lang-arg exists in .tasks
+
+positional arguments:
+arg          : full name of task/tool/lang to test is loaded
+
+options:
+-h, --help    : show this help message and exit
+
+
+"
+    exit "${PRINTED_HELP:-2}"
+}
+
+function verbose-result () {
+    if [[ "${VERBOSE:-0}" -eq 0 ]]; then
+       exit "$1"
+    fi
+
+    if [[ "$1" -eq 0 ]]; then
+        echo "$target is loaded"
+    else
+        echo "$target is not loaded"
+    fi
+    exit "$1"
+}
+
+print-help "$@"
+
+target="${1:-}"
+
+case "$target" in
+    tool-*|task-*|lang-*)
+        [[ -d "$target" ]]
+            verbose-result "$?"
+        ;;
+    *)
+        fail "Bad format of check target. it should be one of [tool-{}, task-{}, lang-{}]"
+        ;;
+esac
+
+
