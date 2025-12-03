@@ -50,3 +50,4 @@ function verbose-result () {
 print-help "$@"
 
 cookiecutter polyglot
+# TODO: iniitialise git
