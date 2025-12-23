@@ -15,14 +15,14 @@ POLY_SRC=$(realpath "$(dirname "$current_script_path")")
 source "$POLY_SRC/lib/lib-util.bash"
 source "$POLY_SRC/lib/lib-hooks.bash"
 
-if [[ "$1" = "new" ]]; then
+if [[ "${1:-}" = "new" ]]; then
     # early override for when you aren't in a workspace,
     # and want one.
     run-cmd "$POLY_SRC/cmds" "polyglot-" "$@"
     exit "$?"
 fi
 
-if [[ -z "$POLYGLOT_ROOT" ]]; then
+if [[ -z "${POLYGLOT_ROOT:-}" ]]; then
     # if you think you're in a workspace, but aren't.
     echo "(Polyglot $POLYGLOT_VERSION): Make sure theres a POLYGLOT_ROOT env var"
     exit 1
@@ -57,5 +57,7 @@ result="$?"
 if [[ "$result" -ne "$NOTHING" ]]; then
     exit "$result"
 fi
+
+# TODO: if not a cmd, try an alias from polyglot.toml
 
 fail "No Applicable Command or task found."

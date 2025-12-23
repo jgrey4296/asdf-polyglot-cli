@@ -16,7 +16,7 @@ function print-help () {
     esac
     echo -e "polyglot list [arg]
 
-where arg = [t|tasks, l|langs, o|tools]
+where arg = [t|tasks, l|langs, o|tools, templates]
 
 List available tasks, languages, and tools.
 "
@@ -34,6 +34,9 @@ case "${1:-}" in
         ;;
     tools|o)
         TARGET="tool-"
+        ;;
+    templates)
+        fail "TODO"
         ;;
     *)
         echo "Unknown target"

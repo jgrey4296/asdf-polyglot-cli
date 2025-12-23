@@ -77,6 +77,8 @@ function run-subcmd () {
         fail "No Possible Subcmds Found"
     elif [[ "${#possible[@]}" -gt 1 ]]; then
         fail "Too Many Possible Subcmds Found: ${#possible[@]}"
+    elif [[ -z "${possible[0]:-}" ]]; then
+        fail "No possible subcmds found"
     fi
 
     sub="${possible[0]}"
