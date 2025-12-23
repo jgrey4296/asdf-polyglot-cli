@@ -13,11 +13,12 @@ plugin_dir=$(dirname "$(dirname "$current_script_path")")
 # shellcheck source=../lib/utils.bash
 source "${plugin_dir}/lib/utils.bash"
 
-mkdir -pp "$ASDF_INSTALL_PATH/bin"
+mkdir -p "$ASDF_INSTALL_PATH/bin"
 
 # just move the copied polyglot scripts into install dir
-cp -r "${ASDF_DOWNLOAD_PATH}"/polyglot/* "$ASDF_INSTALL_PATH/bin"
+cp -r "${ASDF_DOWNLOAD_PATH}/polyglot/"* "$ASDF_INSTALL_PATH/bin"
 
 chmod +x "${ASDF_INSTALL_PATH}/bin/polyglot"
 chmod +x "${ASDF_INSTALL_PATH}/bin/cargo-pg"
 chmod +x "${ASDF_INSTALL_PATH}/bin/cargo-polyglot"
+chmod +x "${ASDF_INSTALL_PATH}/bin/pg"
