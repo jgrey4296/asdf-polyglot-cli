@@ -32,25 +32,6 @@ options:
     exit "$PRINTED_HELP"
 }
 
-function list-subcmds () {
-    local base="$1"
-    local prefix="$2"
-    local tool="$3"
-    shift 3
-    local count=0
-    [[ -d "$tool" ]] || fail "No Tool Specified to list subcmds of"
-    [[ -d "$base/${prefix}-${tool}" ]] || fail "Tool could not be found: $tool"
-
-    echo -e "Active Subcommands for $tool: "
-    for subcmd in $(find "$base/${prefix}-${tool}" -executable -a -type f | sort -V)
-    do
-        bname=$( basename "$subcmd" )
-        echo -e "-($count): ${bname}"
-        count=$(( 1 + count ))
-    done
-    exit 0
-}
-
 function run-tool-subcmd () {
     # run-tool-subcmd {basedir} {subcmd} {args}
     # task is of the form lang-{sub} or tool-{sub}
@@ -66,14 +47,14 @@ function run-tool-subcmd () {
 }
 
 print-help "$@"
-DO_LIST=0
 TOOL=""
 SUBCMD=""
 TOOL_ARGS=()
-while [[ $# -gt 0 ]]; do
-    case $1 in
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
         -l|--list)
-            DO_LIST=1
+            list-entries "$POLYGLOT_ROOT/.tasks" "tool" "$TOOL"
+            exit
             ;;
         *) # Positional
             if [[ -z "$TOOL" ]]; then
@@ -90,7 +71,4 @@ while [[ $# -gt 0 ]]; do
 done
 
 subhead "Tool: $TOOL.$SUBCMD :(${#TOOL_ARGS[@]}) ${TOOL_ARGS[*]}"
-
-[[ "$DO_LIST" = 0 ]] || list-subcmds "$POLYGLOT_ROOT/.tasks" "tool" "$TOOL"
-
 run-tool-subcmd "$POLYGLOT_ROOT/.tasks" "tool" "$TOOL" "$SUBCMD" "${TOOL_ARGS[@]}"

@@ -22,8 +22,12 @@ function fail () {
 
 function header () {
     [[ -z "${POLYGLOT_SUPPRESS_HEADER:-}" ]] || return
-    echo -e "${HEADER_PREFIX} ${HEADER_LINE}\n${HEADER_PREFIX} ${*}\n${HEADER_PREFIX} ${HEADER_LINE}"
-
+    echo "$HEADER_PREFIX $HEADER_LINE"
+    for line in "$@"
+    do
+        echo -e "${HEADER_PREFIX} ${line}"
+    done
+    echo "$HEADER_PREFIX $HEADER_LINE"
 }
 
 function subhead () {
@@ -45,15 +49,7 @@ function pctx () {
 }
 
 function sep () {
-    echo "-------------------------"
-}
-
-function is-help-flag () {
-    # returns 1 if --help or -h is passed in
-    case "$1" in
-        -h|--help) return 1 ;;
-        *) return 0 ;;
-    esac
+    echo "$HEADER_LINE"
 }
 
 function check-target () {
@@ -101,4 +97,26 @@ function pushctx () {
         ctx="$1"
     fi
     echo "$ctx"
+}
+
+function list-entries () {
+    local target_path="$1"
+    shift
+    case "${1:-}" in
+        "") target_path="$target_path/" ;;
+        lang|tool|task)
+            target_path="$target_path/$1-"
+        ;;
+        *) ;;
+    esac
+    shift
+    case "${1:-}" in
+        "") ;;
+        *) target_path="${target_path}${1}/" ;;
+    esac
+
+    for val in "$target_path"*
+    do
+        echo $(basename "$val")
+    done
 }

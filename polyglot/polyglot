@@ -11,53 +11,54 @@ POLYGLOT_VERSION="0.2.0"
 current_script_path=$(realpath "${BASH_SOURCE[0]}")
 POLY_SRC=$(realpath "$(dirname "$current_script_path")")
 
-# shellcheck disable=SC1090
+PATH="$POLY_SRC/cmds:$PATH"
+# shellcheck disable=SC1091
 source "$POLY_SRC/lib/lib-util.bash"
-source "$POLY_SRC/lib/lib-hooks.bash"
 
-if [[ "${1:-}" = "new" ]]; then
-    # early override for when you aren't in a workspace,
-    # and want one.
-    run-cmd "$POLY_SRC/cmds" "polyglot-" "$@"
-    exit "$?"
-fi
+function maybe-run-new () {
+    if [[ "${1:-}" = "new" ]]; then
+        shift
+        # early override for when you aren't in a workspace,
+        # and want one.
+        # shellcheck disable=SC2097,SC2098
+        POLY_SRC="$POLY_SRC" polyglot-new "$@"
+        exit "$?"
+    fi
+}
 
-if [[ -z "${POLYGLOT_ROOT:-}" ]]; then
-    # if you think you're in a workspace, but aren't.
-    echo "(Polyglot $POLYGLOT_VERSION): Make sure theres a POLYGLOT_ROOT env var, or run `polyglot new`"
-    exit 1
-fi
+function print-help () {
+    # test args, if the last one is -h or --help
+    # print help and exit
+    case "${@: -1}" in
+        -h|--help) ;;
+        *) [[ "$#" = 0 ]] || return ;;
+    esac
+    # shellcheck disable=SC2098,SC2097
+    POLY_SRC="$POLY_SRC" polyglot-help
+    exit 0
+}
+
+function print-version () {
+    case "${@: -1}" in
+        -v|--version) echo "$POLYGLOT_VERSION" && exit 0 ;;
+    esac
+}
 
 # General
 VERBOSE=${VERBOSE:-0}
 
-if [[ "${1:-}" = "polyglot" ]]; then
-    shift
-fi
-is-help-flag "${1:-}"
-is_help="$?"
-if [[ "$#" -eq 0 ]] || [[ "$is_help" -gt 0 ]]; then
-    # print help if you just call polyglot
-    # shellcheck disable=SC2098,SC2097
-    POLY_SRC="$POLY_SRC" "$POLY_SRC/cmds/polyglot-help"
-    exit 0
-fi
-
-case "${@: -1}" in
-    -v|--version)
-        echo "$POLYGLOT_VERSION"
-        exit 0
+case "${POLYGLOT_ROOT:-}" in
+    "") # Not in a workspace
+        print-help "$@"
+        print-version "$@"
+        maybe-run-new "$@"
+        fail "(Polyglot $POLYGLOT_VERSION): Make sure theres a POLYGLOT_ROOT env var, or run 'polyglot new'"
+    ;;
+    *) # In a workspace
+        print-version "$@"
+        cmd="polyglot-${1:-help}"
+        shift
+        POLY_SRC="$POLY_SRC" "$cmd" "$@"
+        exit "$?"
     ;;
 esac
-
-# Polyglot Internal:
-# polyglot {cmd}
-run-cmd "$POLY_SRC/cmds" "polyglot-" "$@"
-result="$?"
-if [[ "$result" -ne "$NOTHING" ]]; then
-    exit "$result"
-fi
-
-# TODO: if not a cmd, try an alias from polyglot.toml
-
-fail "No Applicable Command or task found: $*"

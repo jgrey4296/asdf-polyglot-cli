@@ -80,22 +80,6 @@ function run-task () {
     return 0
 }
 
-function list-hooks () {
-    local base="$1"
-    local prefix="$2"
-    local task="$3"
-    shift 3
-    local count=0
-    echo "Active Hooks for $task: "
-    for hook in $(find "$base/${prefix}-${task}" -executable -a -type f | sort -V)
-    do
-        hname=$( basename "$hook" )
-        echo -e "-($count): ${hname}"
-        count=$(( 1 + count ))
-    done
-    exit 0
-}
-
 function run-nth-hook () {
     local base="$1"
     local prefix="$2"
@@ -126,15 +110,15 @@ function run-nth-hook () {
 }
 
 print-help "$@"
-DO_LIST=0
 DO_DRY=0
 NTH_HOOK=""
 TASK_ARGS=()
 TARGET=""
-while [[ $# -gt 0 ]]; do
-    case $1 in
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
         -l|--list)
-            DO_LIST=1
+            list-entries "$POLYGLOT_ROOT/.tasks" "task" "$TARGET"
+            exit
             ;;
         -d|--dry)
             DO_DRY=1
@@ -144,20 +128,17 @@ while [[ $# -gt 0 ]]; do
             NTH_HOOK="${KEYVAL[1]}"
             ;;
         *) # Positional
-            TARGET="$1"
-            shift
-            TASK_ARGS=("$@")
-            break
+            if [[ -z "$TARGET" ]]; then
+                TARGET="$1"
+            else
+                TASK_ARGS+="$1"
+            fi
             ;;
     esac
     shift
 done
 
 subhead "Task $TARGET"
-
-if [[ "$DO_LIST" = 1 ]]; then
-    list-hooks "$POLYGLOT_ROOT/.tasks" "task" "$TARGET"
-fi
 
 if [[ -n "${NTH_HOOK:-}" ]]; then
     run-nth-hook "$POLYGLOT_ROOT/.tasks" "task" "${NTH_HOOK}" "$TARGET" "${TASK_ARGS[@]}"

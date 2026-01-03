@@ -31,26 +31,6 @@ options:
     exit "$PRINTED_HELP"
 }
 
-function list-subcmds () {
-    local base="$1"
-    local prefix="$2"
-    local lang="$3"
-    shift 3
-    local count=0
-    [[ -d "$lang" ]] || fail "No language Specified to list subcmds of"
-    [[ -d "$base/${prefix}-${lang}" ]] || fail "Language could not be found: $lang"
-
-
-    echo -e "Active Subcommands for $lang: "
-    for subcmd in $(find "$base/${prefix}-${lang}" -executable -a -type f | sort -V)
-    do
-        bname=$( basename "$subcmd" )
-        echo -e "-($count): ${bname}"
-        count=$(( 1 + count ))
-    done
-    exit 0
-}
-
 function run-subcmd () {
     # run-subcmd {basedir} {subcmd} {args}
     # task is of the form lang-{sub} or lang-{sub}
@@ -70,14 +50,14 @@ function run-subcmd () {
 
 print-help "$@"
 
-DO_LIST=0
 TARGET_LANG=""
 SUBCMD=""
 LANG_ARGS=()
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -l|--list)
-            DO_LIST=1
+            list-entries "$POLYGLOT_ROOT/.tasks" "lang" "$TARGET_LANG"
+            exit
             ;;
         *) # Positional
             if [[ -z "$TARGET_LANG" ]]; then
@@ -94,7 +74,5 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 subhead "Lang: $TARGET_LANG.$SUBCMD :(${#LANG_ARGS[@]}) ${LANG_ARGS[*]}"
-
-[[ "$DO_LIST" = 0 ]] || list-subcmds "$POLYGLOT_ROOT/.tasks" "lang" "$TARGET_LANG"
 
 run-subcmd "$POLYGLOT_ROOT/.tasks" "lang" "$TARGET_LANG" "$SUBCMD" "${LANG_ARGS[@]}"
