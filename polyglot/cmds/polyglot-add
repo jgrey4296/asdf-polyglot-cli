@@ -36,40 +36,36 @@ options:
     exit "${PRINTED_HELP:-2}"
 }
 
-function verbose-result () {
-    if [[ "${VERBOSE:-0}" -eq 0 ]]; then
-       exit "$1"
-    fi
+function add-ws-member () {
+    local type="$1"
+    local name="$2"
+    local POLY_CTX="$POLY_CTX"
+    subhead "Adding $type: $name"
+    POLY_CTX=$(pushctx "$name")
 
-    if [[ "$1" -eq 0 ]]; then
-        echo "$target is loaded"
-    else
-        echo "$target is not loaded"
-    fi
-    exit "$1"
+    polyglot check "$type" "$name" && tdot "add" "Member already added" && return
+
+    (cookiecutter --no-input --output-dir "$POLYGLOT_ROOT/.tasks" "$type:$name" >/dev/null) || fail "Failed to create $type $name"
+
+    case "$type" in
+        tool|lang)
+            polyglot check "$type" "$name" init || return 0
+            polyglot "$type" "$name" init || fail "Failed to initialise $type $name"
+            ;;
+        task) ;;
+    esac
 }
 
 print-help "$@"
-
 type="$1"
 name="$2"
 
+[[ -d "$POLYGLOT_ROOT/.tasks" ]] || fail "Tasks directory does not exist"
+
 case "$type" in
-    util)
-        subhead "Creating lang-$name"
-        pushd "$POLYGLOT_ROOT/.tasks" || fail "Failed to go to tasks dir"
-        cookiecutter "$type:$name"
-        popd || fail "Failed to return from tasks dir"
-        ;;
-    tool|task|lang)
-        subhead "Creating $type-$name"
-        pushd "$POLYGLOT_ROOT/.tasks" || fail "Failed to go to tasks dir"
-        cookiecutter "$type:$name"
-        popd || fail "Failed to return from tasks dir"
-        ;;
-    *)
-        fail "Bad type. It should be one of [tool, task, lang]"
-        ;;
+    tool|lang|task) add-ws-member "$type" "$name" ;;
+    util)      add-ws-member "lang" "$name" ;;
+    *) fail "Bad type. It should be one of [tool, task, lang, util]" ;;
 esac
 
 

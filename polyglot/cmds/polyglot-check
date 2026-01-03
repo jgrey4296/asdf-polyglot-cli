@@ -34,34 +34,24 @@ options:
     exit "${PRINTED_HELP:-2}"
 }
 
-function verbose-result () {
-    if [[ "${VERBOSE:-0}" -eq 0 ]]; then
-       exit "$1"
-    fi
-
-    if [[ "$1" -eq 0 ]]; then
-        echo "$target is loaded"
-    else
-        echo "$target is not loaded"
-    fi
-    exit "$1"
-}
-
 print-help "$@"
 
-target="${1:-}"
+type="$1"
+target="$2"
+subtarget="${3:-}"
 
-# TODO: if a tool/lang exists and has an is-active,
-# call and return that.
-
-case "$target" in
-    tool-*|task-*|lang-*)
-        [[ -d "$target" ]]
-            verbose-result "$?"
-        ;;
-    *)
-        fail "Bad format of check target. it should be one of [tool-{}, task-{}, lang-{}]"
-        ;;
+case "$type" in
+    tool|task|lang) ;;
+    *) fail "Unrecognised check type: $type"
 esac
 
+joined="${type}-${target}"
+path="${POLYGLOT_ROOT}/.tasks/${joined}"
 
+# Check for general existance
+[[ -d "$path" ]] || exit 1
+
+# If a specific part is provided, check for it
+[[ -n "$subtarget" ]] || exit 0
+
+subcmd-exists-check "$path" "$subtarget"

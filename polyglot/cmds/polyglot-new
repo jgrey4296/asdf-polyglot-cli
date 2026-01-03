@@ -14,9 +14,9 @@ function print-help () {
     case "${@: -1}" in
         -h|--help) ;;
         *) if [[ "$#" -gt 0 ]]; then
-               return
+              return
            fi
-           ;;
+              ;;
     esac
     echo -e "
 usage: polyglot new [-h]
@@ -34,20 +34,30 @@ options:
     exit "${PRINTED_HELP:-2}"
 }
 
-function verbose-result () {
-    if [[ "${VERBOSE:-0}" -eq 0 ]]; then
-       exit "$1"
-    fi
-
-    if [[ "$1" -eq 0 ]]; then
-        echo "$target is loaded"
-    else
-        echo "$target is not loaded"
-    fi
-    exit "$1"
-}
-
 print-help "$@"
 
-cookiecutter polyglot
-# TODO: iniitialise git
+proj_name="$1"
+
+if [[ -d "$PWD/${proj_name}" ]]; then
+    fail "Workspace already exists: ${proj_name}"
+fi
+
+header "Creating Workspace: $proj_name"
+POLY_CTX=$(pushctx "new")
+
+cookiecutter --no-input polyglot proj_name="$proj_name"
+[[ -d "$PWD/${proj_name}" ]] || fail "Failed to create project"
+pushd "${proj_name}" >/dev/null || fail "Failed to enter new project for initalisation"
+
+POLY_CTX=$(pushctx "workspace")
+pctx "Setting up workspace"
+
+tdot "git" "Initialising git"
+git init >/dev/null
+git add --all 2>/dev/null
+git commit -m "[initial]: workspace creation" 2>/dev/null >/dev/null
+
+direnv allow
+POLY_CTX="$POLY_CTX" direnv exec . polyglot task init     || fail "Failed to initialise"
+POLY_CTX="$POLY_CTX" direnv exec . polyglot task validate || fail "Failed to validate"
+popd >/dev/null || fail "Failed to enter new project"

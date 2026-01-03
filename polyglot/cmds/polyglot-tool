@@ -38,14 +38,11 @@ function list-subcmds () {
     local tool="$3"
     shift 3
     local count=0
-    if [[ -z "$tool" ]]; then
-        fail "No Tool Specified to list subcmds of"
-    elif [[ ! -d "$base/$prefix$tool" ]]; then
-        fail "Tool could not be found: $tool"
-    fi
+    [[ -d "$tool" ]] || fail "No Tool Specified to list subcmds of"
+    [[ -d "$base/${prefix}-${tool}" ]] || fail "Tool could not be found: $tool"
 
     echo -e "Active Subcommands for $tool: "
-    for subcmd in $(find "$base/$prefix$tool" -executable -a -type f | sort -V)
+    for subcmd in $(find "$base/${prefix}-${tool}" -executable -a -type f | sort -V)
     do
         bname=$( basename "$subcmd" )
         echo -e "-($count): ${bname}"
@@ -54,42 +51,18 @@ function list-subcmds () {
     exit 0
 }
 
-function run-subcmd () {
-    # run-subcmd {basedir} {subcmd} {args}
+function run-tool-subcmd () {
+    # run-tool-subcmd {basedir} {subcmd} {args}
     # task is of the form lang-{sub} or tool-{sub}
     local base="$1"
     local prefix="$2"
-    local tool="${3:-}"
-    local target="${4:-}"
-    shift 3
-    local count=0
-    if [[ -z "$target" ]]; then
-        fail "No Applicable tool subcommand specified"
-    fi
-    debug "- Checking for subcommand ${prefix}$tool: $target"
-    if [[ ! -d "$base/$prefix$tool" ]]; then
-        fail "No Applicable Tool Found: ${tool}"
-    fi
+    local tool="$3"
+    local target="$4"
+    shift 4
+    [[ -d "$base/${prefix}-${tool}" ]] || fail "No Applicable Tool Found: ${tool}"
 
-    local possible
-    readarray -d '' possible < <(find "$base/${prefix}${tool}" -name "${target}*" -a -executable -print0)
-    if [[ "${#possible[@]}" -lt 0 ]]; then
-        fail "No Possible Subcmds Found"
-    elif [[ "${#possible[@]}" -gt 1 ]]; then
-        fail "Too Many Possible Subcmds Found: ${#possible[@]}"
-    elif [[ -z "${possible[0]:-}" ]]; then
-        fail "No possible subcmds found"
-    fi
-
-    sub="${possible[0]}"
-    if [[ -x "$sub" ]]; then
-        POLY_SRC="$POLY_SRC" "$sub" "$@"
-        echo "Result: $?"
-        return
-    else
-        echo "not executable"
-    fi
-    return "$NOTHING"
+    subcmd-run "$base/${prefix}-${tool}" "${target}"
+    return "$?"
 }
 
 print-help "$@"
@@ -116,8 +89,8 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-header "polyglot tool: $TOOL.$SUBCMD :(${#TOOL_ARGS[@]}) ${TOOL_ARGS[*]}"
-if [[ "$DO_LIST" = 1 ]]; then
-    list-subcmds "$POLYGLOT_ROOT/.tasks" "tool-" "$TOOL"
-fi
-run-subcmd "$POLYGLOT_ROOT/.tasks" "tool-" "$TOOL" "$SUBCMD" "${TOOL_ARGS[@]}"
+subhead "Tool: $TOOL.$SUBCMD :(${#TOOL_ARGS[@]}) ${TOOL_ARGS[*]}"
+
+[[ "$DO_LIST" = 0 ]] || list-subcmds "$POLYGLOT_ROOT/.tasks" "tool" "$TOOL"
+
+run-tool-subcmd "$POLYGLOT_ROOT/.tasks" "tool" "$TOOL" "$SUBCMD" "${TOOL_ARGS[@]}"

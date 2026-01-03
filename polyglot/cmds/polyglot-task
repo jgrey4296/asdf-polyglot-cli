@@ -4,6 +4,7 @@
 set -o nounset
 set -o pipefail
 
+# shellcheck disable=SC1091
 source "$POLY_SRC/lib/lib-util.bash"
 
 function print-help () {
@@ -40,22 +41,22 @@ function run-task () {
     local task="$4"
     shift 4
     local count=0
-    debug "- Checking for ${prefix/-/}: $task"
-    if [[ ! -d "$base/$prefix$task" ]]; then
-        return "$NOTHING"
-    fi
-    debug "- Running $task (dry=$dry)"
+    local ctx
+    [[ -d "$base/${prefix}-${task}" ]] || return "$NOTHING"
 
-    for hook in $(find "$base/$prefix$task" -executable -a -type f | sort -V)
+    for hook in $(find "$base/${prefix}-${task}" -executable -a -type f | sort -V)
     do
         hname=$( basename "$hook" )
+        ctx=$(pushctx "$task")
+
         if [[ "$dry" -gt 0 ]]; then
             subhead "(dry) $hname ${*}"
         else
             (
                 POLY_SRC="$POLY_SRC" \
-                HOOK_NUM="$count" \
-                    "$hook" "$@"
+                POLY_HOOK="$count" \
+                POLY_CTX="$ctx" \
+                "$hook" "$@"
             )
         fi
         case "$?" in
@@ -73,7 +74,6 @@ function run-task () {
             ;;
         esac
         count=$(( 1 + count ))
-        echo ""
     done
 
     header "Finished: $task. ($count) hooks ran."
@@ -87,7 +87,7 @@ function list-hooks () {
     shift 3
     local count=0
     echo "Active Hooks for $task: "
-    for hook in $(find "$base/$prefix$task" -executable -a -type f | sort -V)
+    for hook in $(find "$base/${prefix}-${task}" -executable -a -type f | sort -V)
     do
         hname=$( basename "$hook" )
         echo -e "-($count): ${hname}"
@@ -105,7 +105,7 @@ function run-nth-hook () {
     local count=0
     echo -e "Running hook ($nth) with ($#) args: ${*} "
 
-    for hook in $(find "$base/$prefix$task" -executable -a -type f | sort -V)
+    for hook in $(find "$base/${prefix}-${task}" -executable -a -type f | sort -V)
     do
         hname=$( basename "$hook" )
         if [[ "$nth" = "$count" ]]; then
@@ -153,14 +153,14 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-header "polyglot task"
+subhead "Task $TARGET"
 
 if [[ "$DO_LIST" = 1 ]]; then
-    list-hooks "$POLYGLOT_ROOT/.tasks" "task-" "$TARGET"
+    list-hooks "$POLYGLOT_ROOT/.tasks" "task" "$TARGET"
 fi
 
 if [[ -n "${NTH_HOOK:-}" ]]; then
-    run-nth-hook "$POLYGLOT_ROOT/.tasks" "task-" "${NTH_HOOK}" "$TARGET" "${TASK_ARGS[@]}"
+    run-nth-hook "$POLYGLOT_ROOT/.tasks" "task" "${NTH_HOOK}" "$TARGET" "${TASK_ARGS[@]}"
 else
-    run-task     "$POLYGLOT_ROOT/.tasks" "task-" "$DO_DRY" "$TARGET" "${TASK_ARGS[@]}"
+    run-task     "$POLYGLOT_ROOT/.tasks" "task" "$DO_DRY" "$TARGET" "${TASK_ARGS[@]}"
 fi

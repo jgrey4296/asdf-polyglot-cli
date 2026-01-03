@@ -24,7 +24,7 @@ fi
 
 if [[ -z "${POLYGLOT_ROOT:-}" ]]; then
     # if you think you're in a workspace, but aren't.
-    echo "(Polyglot $POLYGLOT_VERSION): Make sure theres a POLYGLOT_ROOT env var"
+    echo "(Polyglot $POLYGLOT_VERSION): Make sure theres a POLYGLOT_ROOT env var, or run `polyglot new`"
     exit 1
 fi
 
@@ -60,4 +60,4 @@ fi
 
 # TODO: if not a cmd, try an alias from polyglot.toml
 
-fail "No Applicable Command or task found."
+fail "No Applicable Command or task found: $*"
