@@ -1,0 +1,53 @@
+#!/usr/bin/env -S bash
+#  polyglot-env -*- mode: sh -*-
+
+#set -o errexit
+set -o nounset
+set -o pipefail
+
+# shellcheck disable=SC1091
+source "$POLY_SRC/lib/lib-util.bash"
+
+PRINTED_HELP="${PRINTED_HELP:-2}"
+HELP_TEXT="
+usage: polyglot env [-h]
+
+Print a stub set of env vars for .envrc
+
+options:
+-h, --help    : show this help message and exit
+
+"
+
+function print-help () {
+    # test args, if the last one is -h or --help
+    # print help and exit
+    case "${@: -1}" in
+        -h|--help) ;;
+        *) return ;;
+    esac
+    echo -e "$HELP_TEXT"
+    exit "$PRINTED_HELP"
+}
+
+
+print-help "$@"
+
+STUB_TEXT="
+# -- Core Polyglot Environment Variables for .envrc
+export POLYGLOT_ROOT=\"\$PWD\"
+
+export POLYGLOT_SRC=\"\$PWD/src\"
+export POLYGLOT_DATA=\"\$PWD/src/_data\"
+
+export POLYGLOT_TEMP=\"\$PWD/.temp\"
+export POLYGLOT_LOGS=\"\$PWD/.temp/logs\"
+export POLYGLOT_DOCS=\"\$PWD/.temp/docs\"
+
+export POLYGLOT_DEFAULT_LANGS=\"python;rust\"
+export POLYGLOT_DEFAULT_TOOLS=\"mdbook\"
+export POLYGLOT_DEFAULT_TASKS=\"validate;sync;build;clean;docs;export;release\"
+# --
+"
+
+echo -e "$STUB_TEXT"

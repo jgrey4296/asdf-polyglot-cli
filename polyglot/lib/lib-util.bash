@@ -42,7 +42,8 @@ function subhead () {
 
 function tdot () {
     # print a message of form [$1] ... $rest
-    local ctx=$(pushctx "$1")
+    local ctx
+    ctx=$(pushctx "$1")
     shift
     echo -e "[$ctx] $TDOT_LINE ${*}"
 }
@@ -124,6 +125,25 @@ function list-entries () {
 
     for val in "$target_path"*
     do
-        echo $(basename "$val")
+        basename "$val"
     done
+}
+
+function print-help () {
+    # test args, if the last one is -h or --help
+    # print help and exit
+    # $1 : help text
+    # $2 : min count of cmd args
+    # $rest : args passed to cmd
+    local HELP_TEXT MIN_COUNT
+    HELP_TEXT="$1"
+    MIN_COUNT="$2"
+    shift 2
+    case "${@: -1}" in
+        -h|--help) ;;
+        *) [[ "$#" -gt "$MIN_COUNT" ]] && return ;;
+    esac
+    echo -e "$HELP_TEXT"
+    exit "${PRINTED_HELP}"
+
 }

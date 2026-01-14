@@ -15,15 +15,21 @@ PATH="$POLY_SRC/cmds:$PATH"
 # shellcheck disable=SC1091
 source "$POLY_SRC/lib/lib-util.bash"
 
-function maybe-run-new () {
-    if [[ "${1:-}" = "new" ]]; then
-        shift
-        # early override for when you aren't in a workspace,
-        # and want one.
-        # shellcheck disable=SC2097,SC2098
-        POLY_SRC="$POLY_SRC" polyglot-new "$@"
-        exit "$?"
-    fi
+function run-free-cmds () {
+    # early override for when you aren't in a workspace,
+    # and want one.
+    local cmdname="$1"
+    shift
+    case "$cmdname" in
+        new)
+            # shellcheck disable=SC2097,SC2098
+            POLY_SRC="$POLY_SRC" polyglot-new "$@"
+            exit "$?" ;;
+        env)
+            POLY_SRC="$POLY_SRC" polyglot-env "$@"
+            exit "$?" ;;
+        *) ;;
+    esac
 }
 
 function print-help () {
@@ -51,7 +57,7 @@ case "${POLYGLOT_ROOT:-}" in
     "") # Not in a workspace
         print-help "$@"
         print-version "$@"
-        maybe-run-new "$@"
+        run-free-cmds "$@"
         fail "(Polyglot $POLYGLOT_VERSION): Make sure theres a POLYGLOT_ROOT env var, or run 'polyglot new'"
     ;;
     *) # In a workspace
