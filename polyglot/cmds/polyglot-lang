@@ -7,15 +7,8 @@ set -o pipefail
 # shellcheck disable=SC1091
 source "$POLY_SRC/lib/lib-util.bash"
 
-function print-help () {
-    case "${@: 1}" in
-        -h|--help) ;;
-        *) if [[ "$#" -gt 0 ]]; then
-               return
-           fi
-           ;;
-    esac
-    echo -e "
+PRINTED_HELP="${PRINTED_HELP:-2}"
+HELP_TEXT="
 usage: polyglot lang [-h] [-l] [langname subcmd]
 
 Use a registered language's subcommand.
@@ -27,7 +20,15 @@ subcmd
 options:
 -h, --help     :  show this help message and exit
 -l, --list     :  list the available subcmds of the language
+
 "
+
+function print-help () {
+    case "${@: 1}" in
+        -h|--help) ;;
+        *) [[ "$#" -gt 0 ]] && return ;;
+    esac
+    echo -e "$HELP_TEXT"
     exit "$PRINTED_HELP"
 }
 
@@ -39,7 +40,6 @@ function run-subcmd () {
     local lang="$3"
     local target="$4"
     shift 4
-    local count=0
     [[ -n "$target" ]] || fail "No Applicable language subcommand specified"
     debug "- Checking for subcommand ${prefix}-$lang: $target"
     [[ -d "$base/${prefix}-${lang}" ]] || fail "No Applicable lang Found: ${lang}"

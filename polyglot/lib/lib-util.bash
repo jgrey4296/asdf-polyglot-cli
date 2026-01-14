@@ -10,17 +10,18 @@ SUBHEAD_LINE="----------"
 TDOT_LINE="..."
 
 function debug () {
-    if [ "${VERBOSE:-0}" -eq 1 ]; then
-        echo "$@"
-    fi
+    # A Debug message when the VERBOSE envar is set
+    [[ "${VERBOSE:-0}" -eq 0 ]] || echo -e "$@"
 }
 
 function fail () {
+    # message and force quit
     echo -e "Failed: ${*}"
     exit 1
 }
 
 function header () {
+    # Print lines passed in, wrapped.
     [[ -z "${POLYGLOT_SUPPRESS_HEADER:-}" ]] || return
     echo "$HEADER_PREFIX $HEADER_LINE"
     for line in "$@"
@@ -31,6 +32,7 @@ function header () {
 }
 
 function subhead () {
+    # print a subheader
     if [[ -n "${POLY_CTX:-}" ]]; then
         echo -e "[${POLY_CTX/^\./}] $SUBHEAD_LINE ${*}"
     else
@@ -39,33 +41,33 @@ function subhead () {
 }
 
 function tdot () {
+    # print a message of form [$1] ... $rest
     local ctx=$(pushctx "$1")
     shift
     echo -e "[$ctx] $TDOT_LINE ${*}"
 }
 
 function pctx () {
+    # print a message of form: [{ctxEnvVar}] ... {msg}
     echo -e "[$POLY_CTX] $TDOT_LINE ${*}"
 }
 
 function sep () {
+    # print a separating line
     echo "$HEADER_LINE"
 }
 
 function check-target () {
-    if [[ ! -d "$POLYGLOT_SRC/$1" ]]; then
-        fail "Target Does not exist: $1"
-    fi
-
-    if [[ ! -e "$POLYGLOT_SRC/$1/$2" ]]; then
-        fail "Target does not have a file to run: $2"
-    fi
+    # Check a target task/tool exists, and the hook/op is executable
+    [[ -d "$POLYGLOT_SRC/$1" ]]    || fail "Target Does not exist: $1"
+    [[ -e "$POLYGLOT_SRC/$1/$2" ]] || fail "Target does not have a file to run: $2"
 }
 
 function subcmd-exists-check () {
+    # Test for a polyglot subcmd
     # 1:path to dir to check for subcmd
     # 2:subcmd
-    [[ -d "$1" ]] || fail "Subcmd dir does not exist: $1"
+    [[ -d "$1" ]]     || fail "Subcmd dir does not exist: $1"
     [[ -n "${2:-}" ]] || fail "No subcmd provided for check"
     local possible
     readarray -d '' possible < <(find "$1" -name "${2}*" -a -executable -print0)
@@ -75,6 +77,7 @@ function subcmd-exists-check () {
 }
 
 function subcmd-run () {
+    # Run a verified polyglot subcmd
     subcmd-exists-check "$@" || fail "No applicable subcmds found"
     local possible
     readarray -d '' possible < <(find "$1" -name "${2}*" -a -executable -print0)
@@ -88,6 +91,7 @@ function subcmd-run () {
 }
 
 function pushctx () {
+    # Add info the POLY_CTX (for pctx printing)
     local ctx
     if [[ -n "${POLY_CTX:-}" ]] && [[ -n "$1" ]]; then
         ctx="${POLY_CTX}.$1"
@@ -100,6 +104,9 @@ function pushctx () {
 }
 
 function list-entries () {
+    # List the available hooks/ops in a target path
+    # $1 : directory to search, eg: $polyglot_root/.tasks
+    # $2 : the tool/task to list
     local target_path="$1"
     shift
     case "${1:-}" in

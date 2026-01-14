@@ -6,6 +6,20 @@ set -o pipefail
 
 source "$POLY_SRC/lib/lib-util.bash"
 
+PRINTED_HELP="${PRINTED_HELP:-2}"
+HELP_TEXT="
+usage: polyglot list [-h] [arg]
+
+List available tasks, languages, and tools.
+
+positional arguments:
+arg          : t|tasks l|langs o|tools
+
+options:
+-h, --help    : show this help message and exit
+
+"
+
 function print-help () {
     case "${@: 1}" in
         -h|--help) ;;
@@ -14,12 +28,7 @@ function print-help () {
            fi
            ;;
     esac
-    echo -e "polyglot list [arg]
-
-where arg = [t|tasks, l|langs, o|tools, templates]
-
-List available tasks, languages, and tools.
-"
+    echo -e "$HELP_TEXT"
     exit "$PRINTED_HELP"
 }
 

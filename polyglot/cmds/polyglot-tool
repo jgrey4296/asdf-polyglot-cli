@@ -7,15 +7,8 @@ set -o pipefail
 # shellcheck disable=SC1091
 source "$POLY_SRC/lib/lib-util.bash"
 
-function print-help () {
-    case "${@: 1}" in
-        -h|--help) ;;
-        *) if [[ "$#" -gt 0 ]]; then
-               return
-           fi
-           ;;
-    esac
-    echo -e "
+PRINTED_HELP="${PRINTED_HELP:-2}"
+HELP_TEXT="
 usage: polyglot tool [-h] [-l] [toolname subcmd]
 
 Use a registered tool's subcommand.
@@ -29,6 +22,16 @@ options:
 -l, --list     :  list the available subcmds of the tool
 
 "
+
+function print-help () {
+    case "${@: 1}" in
+        -h|--help) ;;
+        *) if [[ "$#" -gt 0 ]]; then
+               return
+           fi
+           ;;
+    esac
+    echo -e "$HELP_TEXT"
     exit "$PRINTED_HELP"
 }
 

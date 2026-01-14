@@ -7,15 +7,8 @@ set -o pipefail
 # shellcheck disable=SC1091
 source "$POLY_SRC/lib/lib-util.bash"
 
-function print-help () {
-    case "${@: 1}" in
-        -h|--help) ;;
-        *) if [[ "$#" -gt 0 ]]; then
-               return
-           fi
-           ;;
-    esac
-    echo -e "
+PRINTED_HELP="${PRINTED_HELP:-2}"
+HELP_TEXT="
 usage: polyglot task [-h] [-l] [-hook=int] [target]
 
 Use a registered task.
@@ -28,7 +21,18 @@ options:
 -l, --list    : list the hooks of the target
 -d, --dry     : dry-run the hooks.
 --hook=int    : run just the nth hook of the target
+
 "
+
+function print-help () {
+    case "${@: 1}" in
+        -h|--help) ;;
+        *) if [[ "$#" -gt 0 ]]; then
+               return
+           fi
+           ;;
+    esac
+    echo -e "$HELP_TEXT"
     exit "$PRINTED_HELP"
 }
 
@@ -131,7 +135,7 @@ while [[ "$#" -gt 0 ]]; do
             if [[ -z "$TARGET" ]]; then
                 TARGET="$1"
             else
-                TASK_ARGS+="$1"
+                TASK_ARGS+=("$1")
             fi
             ;;
     esac
