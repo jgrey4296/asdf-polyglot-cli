@@ -41,7 +41,7 @@ function print-help () {
 function add-ws-member () {
     local type="$1"
     local name="$2"
-    local POLY_CTX="$POLY_CTX"
+    local POLY_CTX="${POLY_CTX:-}"
     subhead "Adding $type: $name"
     POLY_CTX=$(pushctx "$name")
 
