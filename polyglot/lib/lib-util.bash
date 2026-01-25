@@ -141,9 +141,8 @@ function print-help () {
     shift 2
     case "${@: -1}" in
         -h|--help) ;;
-        *) [[ "$#" -gt "$MIN_COUNT" ]] && return ;;
+        *) [[ "$#" -ge "$MIN_COUNT" ]] && return ;;
     esac
     echo -e "$HELP_TEXT"
     exit "${PRINTED_HELP}"
-
 }

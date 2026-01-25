@@ -10,12 +10,15 @@ source "$POLY_SRC/lib/lib-util.bash"
 
 PRINTED_HELP="${PRINTED_HELP:-2}"
 HELP_TEXT="
-usage: polyglot check [-h] [arg]
+usage: polyglot check [-h] [type] [arg]
 
-Checks that a task-arg, tool-arg, or lang-arg exists in .tasks
+Checks that a task, tool, or lang component exists in .tasks.
+
+eg: polyglot check task release
 
 positional arguments:
-arg          : full name of task/tool/lang to test is loaded
+type   : task/tool/lang
+name   : name of the component to check for.
 
 options:
 -h, --help    : show this help message and exit
