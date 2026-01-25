@@ -23,18 +23,6 @@ options:
 
 "
 
-function print-help () {
-    case "${@: 1}" in
-        -h|--help) ;;
-        *) if [[ "$#" -gt 0 ]]; then
-               return
-           fi
-           ;;
-    esac
-    echo -e "$HELP_TEXT"
-    exit "$PRINTED_HELP"
-}
-
 function run-tool-subcmd () {
     # run-tool-subcmd {basedir} {subcmd} {args}
     # task is of the form lang-{sub} or tool-{sub}
@@ -49,7 +37,7 @@ function run-tool-subcmd () {
     return "$?"
 }
 
-print-help "$@"
+print-help "$HELP_TEXT" 0 "$@"
 TOOL=""
 SUBCMD=""
 TOOL_ARGS=()

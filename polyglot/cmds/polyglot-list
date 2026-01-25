@@ -20,19 +20,8 @@ options:
 
 "
 
-function print-help () {
-    case "${@: 1}" in
-        -h|--help) ;;
-        *) if [[ "$#" -gt 0 ]]; then
-               return
-           fi
-           ;;
-    esac
-    echo -e "$HELP_TEXT"
-    exit "$PRINTED_HELP"
-}
+print-help "$HELP_TEXT" 0 "$@"
 
-print-help "$@"
 TARGET=""
 case "${1:-}" in
     tasks|t)

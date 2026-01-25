@@ -25,21 +25,7 @@ options:
 
 "
 
-function print-help () {
-    # test args, if the last one is -h or --help
-    # print help and exit
-    case "${@: -1}" in
-        -h|--help) ;;
-        *) if [[ "$#" -gt 0 ]]; then
-               return
-           fi
-           ;;
-    esac
-    echo -e "${HELP_TEXT}"
-    exit "$PRINTED_HELP"
-}
-
-print-help "$@"
+print-help "$HELP_TEXT" 0 "$@"
 
 type="$1"
 target="$2"
