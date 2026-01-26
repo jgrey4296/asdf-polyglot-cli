@@ -50,7 +50,7 @@ function tdot () {
 
 function pctx () {
     # print a message of form: [{ctxEnvVar}] ... {msg}
-    echo -e "[$POLY_CTX] $TDOT_LINE ${*}"
+    echo -e "[${POLY_CTX:-}] $TDOT_LINE ${*}"
 }
 
 function sep () {
@@ -145,4 +145,17 @@ function print-help () {
     esac
     echo -e "$HELP_TEXT"
     exit "${PRINTED_HELP}"
+}
+
+function print-env-failures() {
+    # $1 : failure array
+    local fail_array
+    if [[ "${#@}" -gt 0 ]]; then
+        echo "Missing Env vars:"
+        for val in "$@"
+        do
+            echo "- $val"
+        done
+        fail "Environment Is Not Correct"
+    fi
 }
