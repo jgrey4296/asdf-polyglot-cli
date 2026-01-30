@@ -88,7 +88,7 @@ function run-nth-hook () {
             subhead "Running hook $count: $hname"
             (
                 POLY_SRC="$POLY_SRC" \
-                    HOOK_NUM="$count" \
+                    POLY_HOOK="$count" \
                     "$hook" "$@"
             )
             subhead "Skipping remaining hooks"
