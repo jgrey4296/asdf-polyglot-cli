@@ -149,10 +149,10 @@ function print-help () {
 
 function print-env-failures() {
     # $1 : failure array
-    local fail_array
-    if [[ "${#@}" -gt 0 ]]; then
-        echo "Missing Env vars:"
-        for val in "$@"
+    declare -a fail_array=("$@")
+    if [[ -n "${fail_array:-}" ]] && [[ "${#fail_array[@]}" -gt 0 ]]; then
+        pctx "Missing Env vars:"
+        for val in "${fail_array[@]}"
         do
             echo "- $val"
         done
