@@ -24,6 +24,8 @@ options:
 
 "
 
+target="$POLYGLOT_ROOT/.temp/"
+
 function add-ws-member () {
     local type="$1"
     local name="$2"
@@ -32,8 +34,23 @@ function add-ws-member () {
     POLY_CTX=$(pushctx "$name")
 
     polyglot check "$type" "$name" && tdot "add" "Member already added" && return
+    tdot "add" "Target: $target"
 
-    (cookiecutter --no-input --output-dir "$POLYGLOT_ROOT/.tasks" "$type:$name" >/dev/null) || fail "Failed to create $type $name"
+    [[ ! -d "$target/_slug" ]] || rm -rf "$target/_slug"
+
+    ( cookiecutter \
+      --no-input \
+      --output-dir "$target" \
+      "$type:$name" \
+      proj_name=$(basename "$POLYGLOT_ROOT")
+      _slug="_slug"
+    ) || fail "Failed to create $type $name"
+
+    [[ -d "$target/_slug" ]] || fail "Could not find the slug to integrate"
+
+    tdot "merge" "Integrating slug with workspace"
+    rsync --append --archive "$target/_slug/"* "$POLYGLOT_ROOT"
+    rsync --append --archive "$target/_slug/".* "$POLYGLOT_ROOT"
 
     case "$type" in
         tool|lang)
@@ -42,6 +59,9 @@ function add-ws-member () {
             ;;
         task) ;;
     esac
+
+    tdot "cleanup" "removing slug"
+    # rm -rf "$target/_slug"
 }
 
 print-help "$HELP_TEXT" 0 "$@"
@@ -49,6 +69,7 @@ type="$1"
 name="$2"
 
 [[ -d "$POLYGLOT_ROOT/.tasks" ]] || fail "Tasks directory does not exist"
+
 
 case "$type" in
     tool|lang|task) add-ws-member "$type" "$name" ;;

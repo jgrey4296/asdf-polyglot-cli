@@ -24,6 +24,7 @@ options:
 
 print-help "$HELP_TEXT" 0 "$@"
 
+[[ "${#@}" -gt 0 ]] || fail "Provide a name for the project"
 proj_name="$1"
 
 [[ -d "$PWD/${proj_name}" ]] && fail "Workspace already exists: ${proj_name}"
@@ -43,6 +44,7 @@ git init >/dev/null
 git add --all 2>/dev/null
 git commit -m "[initial]: workspace creation" 2>/dev/null >/dev/null
 
+tdot "direnv" "Activating directory environment"
 direnv allow
 POLY_CTX="$POLY_CTX" direnv exec . polyglot task init     || fail "Failed to initialise"
 POLY_CTX="$POLY_CTX" direnv exec . polyglot task validate || fail "Failed to validate"
