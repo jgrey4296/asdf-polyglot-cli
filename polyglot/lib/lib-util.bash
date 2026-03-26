@@ -151,16 +151,19 @@ function maybe-print-help () {
 
     case "$LEVEL" in
         "root")
-        [[ "$#" -eq 0 ]]
+            [[ "$#" -eq 0 ]]
             ACTIVE="$?"
+            echo "root acctive"
             ;;
         "branch")
-            [[ "$#" -eq 0 ]] || ( [[ "$#" -lt "$COUNT" ]] && [[ "$FLAG" -eq 0 ]] )
+            { [[ "$#" -eq 0 ]] && [[ "$COUNT" -gt 0 ]]; } || { [[ "$#" -lt "$COUNT" ]] && [[ "$FLAG" -eq 0 ]]; }
             ACTIVE="$?"
+            echo "branch active"
             ;;
         "leaf")
-            [[ "$#" -eq 0 ]] || ( [[ "$#" -lt "$COUNT" ]] && [[ "$FLAG" -eq 0 ]] )
+            { [[ "$#" -eq 0 ]] && [[ "$COUNT" -gt 0 ]]; } || [[ "$FLAG" -eq 0 ]]
             ACTIVE="$?"
+            echo "leaf active"
             ;;
     esac
 
