@@ -10,16 +10,16 @@ source "$POLY_SRC/lib/lib-util.bash"
 
 PRINTED_HELP="${PRINTED_HELP:-2}"
 HELP_TEXT="
-usage: polyglot env [-h]
+usage: polyglot env [-s] [-h]
 
-Print a stub set of env vars for .envrc
+Print or Stub the env vars for .envrc
 
 options:
 -h, --help    : show this help message and exit
-
+-s, --stub    : print a set of stub env vars
 "
 
-print-help "$HELP_TEXT" 0 "$@"
+maybe-print-help "branch" 0 "$HELP_TEXT" "$@"
 
 STUB_TEXT="
 # -- Core Polyglot Environment Variables for .envrc
@@ -38,4 +38,25 @@ export POLYGLOT_DEFAULT_TASKS=\"validate;sync;build;clean;docs;export;release\"
 # --
 "
 
-echo -e "$STUB_TEXT"
+declare -a ARGS=(-e "POLYGLOT")
+for val in "${POLYGLOT_ENV_PREFIXES[@]}"
+do
+    ARGS+=(-e "$val")
+done
+
+# Print the stub:
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -s|--stub)
+            echo -e "$STUB_TEXT"
+            exit 0
+            ;;
+        *)
+            ARGS+=(-e "$1")
+            ;;
+    esac
+    shift
+done
+
+# Or,
+env | grep "${ARGS[@]}" | sort

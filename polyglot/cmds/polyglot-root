@@ -1,0 +1,27 @@
+#!/usr/bin/env -S bash
+#  polyglot-root -*- mode: sh -*-
+
+#set -o errexit
+set -o nounset
+set -o pipefail
+
+# shellcheck disable=SC1091
+source "$POLY_SRC/lib/lib-util.bash"
+
+PRINTED_HELP="${PRINTED_HELP:-2}"
+HELP_TEXT="
+usage: polyglot root [-h]
+
+Return the (absolute) Path of the current Workspace.
+
+options:
+-h, --help    : show this help message and exit
+
+"
+
+target="$POLYGLOT_ROOT/.temp/"
+
+
+maybe-print-help "branch" 0 "$HELP_TEXT" "$@"
+
+echo "$POLYGLOT_ROOT"

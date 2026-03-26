@@ -22,10 +22,22 @@ options:
 
 "
 
-print-help "$HELP_TEXT" 0 "$@"
+maybe-print-help "branch" 1 "$HELP_TEXT" "$@"
 
 [[ "${#@}" -gt 0 ]] || fail "Provide a name for the project"
 proj_name="$1"
+DO_INIT=0
+shift
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+        --no-init)
+            echo "- Not initializing the workspace"
+            DO_INIT=1
+            ;;
+        *) ;;
+    esac
+    shift
+done
 
 [[ -d "$PWD/${proj_name}" ]] && fail "Workspace already exists: ${proj_name}"
 
@@ -37,7 +49,7 @@ cookiecutter --no-input polyglot proj_name="$proj_name"
 pushd "${proj_name}" >/dev/null || fail "Failed to enter new project for initalisation"
 
 POLY_CTX=$(pushctx "workspace")
-pctx "Setting up workspace"
+pctx "- Setting up workspace"
 
 tdot "git" "Initialising git"
 git init >/dev/null
@@ -46,6 +58,8 @@ git commit -m "[initial]: workspace creation" 2>/dev/null >/dev/null
 
 tdot "direnv" "Activating directory environment"
 direnv allow
-POLY_CTX="$POLY_CTX" direnv exec . polyglot task init     || fail "Failed to initialise"
-POLY_CTX="$POLY_CTX" direnv exec . polyglot task validate || fail "Failed to validate"
+if [[ $DO_INIT -eq -1 ]]; then
+   POLY_CTX="$POLY_CTX" direnv exec . polyglot task init     || fail "Failed to initialise"
+   POLY_CTX="$POLY_CTX" direnv exec . polyglot task validate || fail "Failed to validate"
+fi
 popd >/dev/null || fail "Failed to enter new project"

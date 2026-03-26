@@ -4,16 +4,38 @@
 # shellcheck disable=SC1091
 source "$POLY_SRC/lib/lib-util.bash"
 
-( header \
-    "Polyglot ${POLYGLOT_VERSION}" \
-    "An access point for polyglot project management."
-  )
+function join-array () {
+    local sep="$1"
+    shift
+    printf "%s" "$sep" "${@/#/$sep}"
+}
 
-echo -e "\nAvailable Polyglot cmds:"
+declare -a HELP_TEXT=("usage: polyglot [args ...] [-h] [-v]
+
+The entrypoint for polyglot workspaces.
+
+positional arguments:
+args          :
+{src dir}     : the dir of source .rst and .bib files
+
+options:
+-h, --help    : show this help message and exit
+-nc | -no-clean   : don't delete existing site files
+--conf {conf dir} : the dir for the conf.py
+--out  {out dir}  : the subdir of .temp/site to build into
+
+-v : print the version
+")
+
+
+HELP_TEXT+=("" "Available Polyglot cmds:")
 for task in $(find "$POLY_SRC/cmds" -executable -a -type f | sort -V)
 do
     cmdname=$(basename "$task")
-    echo "- ${cmdname/polyglot-/}"
+    HELP_TEXT+=("- ${cmdname/polyglot-/}")
 done
 
-echo "- list [langs | tools | tasks]"
+HELP_TEXT+=("" "- list [langs | tools | tasks]")
+TOTAL=$(join-array "\n" "${HELP_TEXT[@]}")
+
+maybe-print-help "root" 1 "${TOTAL}" "$@"

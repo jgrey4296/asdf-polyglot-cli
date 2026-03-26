@@ -37,7 +37,7 @@ function run-tool-subcmd () {
     return "$?"
 }
 
-print-help "$HELP_TEXT" 0 "$@"
+maybe-print-help "branch" 2 "$HELP_TEXT" "$@"
 TOOL=""
 SUBCMD=""
 TOOL_ARGS=()

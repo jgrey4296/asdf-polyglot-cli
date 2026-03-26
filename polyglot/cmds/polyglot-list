@@ -20,7 +20,7 @@ options:
 
 "
 
-print-help "$HELP_TEXT" 0 "$@"
+maybe-print-help "branch" 1 "$HELP_TEXT" "$@"
 
 TARGET=""
 case "${1:-}" in

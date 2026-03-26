@@ -39,7 +39,7 @@ function run-subcmd () {
     return "$?"
 }
 
-print-help "$HELP_TEXT" 0 "$@"
+maybe-print-help "branch" 2 "$HELP_TEXT" "$@"
 
 TARGET_LANG=""
 SUBCMD=""

@@ -33,7 +33,7 @@ function add-ws-member () {
     subhead "Adding $type: $name"
     POLY_CTX=$(pushctx "$name")
 
-    polyglot check "$type" "$name" && tdot "add" "Member already added" && return
+    polyglot check "$type" "$name" 2>/dev/null && tdot "add" "Member already added" && return
     tdot "add" "Target: $target"
 
     [[ ! -d "$target/_slug" ]] || rm -rf "$target/_slug"
@@ -64,7 +64,7 @@ function add-ws-member () {
     # rm -rf "$target/_slug"
 }
 
-print-help "$HELP_TEXT" 0 "$@"
+maybe-print-help "branch" 2 "$HELP_TEXT" "$@"
 type="$1"
 name="$2"
 
@@ -73,7 +73,7 @@ name="$2"
 
 case "$type" in
     tool|lang|task) add-ws-member "$type" "$name" ;;
-    util)      add-ws-member "lang" "$name" ;;
+    util)           add-ws-member "util" "$name" ;;
     *) fail "Bad type. It should be one of [tool, task, lang, util]" ;;
 esac
 

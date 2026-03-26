@@ -129,7 +129,50 @@ function list-entries () {
     done
 }
 
+function maybe-print-help () {
+    # $1 : 0=root 1=branch 2=leaf
+    # $2 : defer count
+    # $3 : text
+    # $@ : args
+    local TYPE COUNT TEXT SHOULD_DEFER FLAG ACTIVE
+    LEVEL="$1"
+    COUNT="$2"
+    TEXT="$3"
+    shift 3
+    FLAG=1
+    ACTIVE=1
+
+    case "${@: -1}" in
+        -h|--help)
+            FLAG=0
+            shift
+            ;;
+    esac
+
+    case "$LEVEL" in
+        "root")
+        [[ "$#" -eq 0 ]]
+            ACTIVE="$?"
+            ;;
+        "branch")
+            [[ "$#" -eq 0 ]] || ( [[ "$#" -lt "$COUNT" ]] && [[ "$FLAG" -eq 0 ]] )
+            ACTIVE="$?"
+            ;;
+        "leaf")
+            [[ "$#" -eq 0 ]] || ( [[ "$#" -lt "$COUNT" ]] && [[ "$FLAG" -eq 0 ]] )
+            ACTIVE="$?"
+            ;;
+    esac
+
+    if [[ "$ACTIVE" -eq 0 ]]; then
+        echo -e "$TEXT"
+        exit "$PRINTED_HELP"
+    fi
+
+}
+
 function print-help () {
+    # DEPRECATED, use maybe-print-help
     # test args, if the last one is -h or --help
     # print help and exit
     # $1 : help text
