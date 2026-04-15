@@ -6,13 +6,13 @@ set -o nounset
 set -o pipefail
 
 # shellcheck disable=SC1091
-source "$POLY_SRC/lib/lib-util.bash"
+source "$POLY_SRC/lib/lib.bash"
 
 PRINTED_HELP="${PRINTED_HELP:-2}"
 HELP_TEXT="
 usage: polyglot check [-h] [type] [arg]
 
-Checks that a task, tool, or lang component exists in .tasks.
+Checks that a task, tool, or lang component exists in POLYGLOT_DIR.
 
 eg: polyglot check task release
 
@@ -37,7 +37,7 @@ case "$type" in
 esac
 
 joined="${type}-${target}"
-path="${POLYGLOT_ROOT}/.tasks/${joined}"
+path="$(poly-dir)/${joined}"
 
 # Check for general existance
 [[ -d "$path" ]] || exit 1

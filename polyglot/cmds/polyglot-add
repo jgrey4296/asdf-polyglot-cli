@@ -6,13 +6,13 @@ set -o nounset
 set -o pipefail
 
 # shellcheck disable=SC1091
-source "$POLY_SRC/lib/lib-util.bash"
+source "$POLY_SRC/lib/lib.bash"
 
 PRINTED_HELP="${PRINTED_HELP:-2}"
 HELP_TEXT="
 usage: polyglot add [-h] [type] [name]
 
-Add a task/tool/lang template into .tasks,
+Add a task/tool/lang template into POLYGLOT_DIR(ie:.polyglot),
 using abbreviations set up in cookiecutterrc
 
 positional arguments:
@@ -24,7 +24,7 @@ options:
 
 "
 
-target="$POLYGLOT_ROOT/.temp/"
+target="$POLYGLOT_TEMP"
 
 function add-ws-member () {
     local type="$1"
@@ -68,7 +68,7 @@ maybe-print-help "branch" 2 "$HELP_TEXT" "$@"
 type="$1"
 name="$2"
 
-[[ -d "$POLYGLOT_ROOT/.tasks" ]] || fail "Tasks directory does not exist"
+[[ -d "${POLYGLOT_ROOT}/${POLYGLOT_DIR}" ]] || fail "Polyglot data directory does not exist"
 
 
 case "$type" in

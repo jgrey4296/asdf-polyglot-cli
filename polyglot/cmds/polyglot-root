@@ -6,7 +6,7 @@ set -o nounset
 set -o pipefail
 
 # shellcheck disable=SC1091
-source "$POLY_SRC/lib/lib-util.bash"
+source "$POLY_SRC/lib/lib.bash"
 
 PRINTED_HELP="${PRINTED_HELP:-2}"
 HELP_TEXT="
@@ -18,9 +18,6 @@ options:
 -h, --help    : show this help message and exit
 
 "
-
-target="$POLYGLOT_ROOT/.temp/"
-
 
 maybe-print-help "branch" 0 "$HELP_TEXT" "$@"
 

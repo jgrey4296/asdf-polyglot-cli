@@ -2,7 +2,7 @@
 #  polyglot-help -*- mode: sh -*-
 
 # shellcheck disable=SC1091
-source "$POLY_SRC/lib/lib-util.bash"
+source "$POLY_SRC/lib/lib.bash"
 
 function join-array () {
     local sep="$1"

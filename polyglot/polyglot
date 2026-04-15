@@ -6,42 +6,15 @@
 set -o nounset
 set -o pipefail
 
-POLYGLOT_VERSION="0.3.0"
+POLYGLOT_VERSION="0.4.0"
 
 current_script_path=$(realpath "${BASH_SOURCE[0]}")
 POLY_SRC=$(realpath "$(dirname "$current_script_path")")
 
 PATH="$POLY_SRC/cmds:$PATH"
 # shellcheck disable=SC1091
-source "$POLY_SRC/lib/lib-util.bash"
+source "$POLY_SRC/lib/lib.bash"
 
-function run-free-cmds () {
-    # early override for when you aren't in a workspace,
-    # and want one.
-    print-version "$@"
-    local cmdname="$1"
-    shift
-    case "$cmdname" in
-        new)
-            # shellcheck disable=SC2097,SC2098
-            POLY_SRC="$POLY_SRC" polyglot-new "$@"
-            exit "$?" ;;
-        env)
-            POLY_SRC="$POLY_SRC" polyglot-env "$@"
-            exit "$?" ;;
-        -h|--help|help)
-            POLY_SRC="$POLY_SRC" polyglot-help "$@"
-            exit "$?"
-            ;;
-        *) ;;
-    esac
-}
-
-function print-version () {
-    case "${@: -1}" in
-        -v|--version) echo "$POLYGLOT_VERSION" && exit 0 ;;
-    esac
-}
 
 # General
 VERBOSE=${VERBOSE:-0}
@@ -64,7 +37,7 @@ case "${POLYGLOT_ROOT:-}" in
         POLY_SRC="$POLY_SRC" "$cmd" "$@"
         result="$?"
         case "$result" in
-            "${PRINTED_HELP}" | 0) exit 0;;
+            "${PRINTED_HELP:-2}" | 0) exit 0;;
             *) exit "$result" ;;
         esac
     ;;

@@ -5,7 +5,7 @@ set -o nounset
 set -o pipefail
 
 # shellcheck disable=SC1091
-source "$POLY_SRC/lib/lib-util.bash"
+source "$POLY_SRC/lib/lib.bash"
 
 PRINTED_HELP="${PRINTED_HELP:-2}"
 HELP_TEXT="
@@ -23,22 +23,6 @@ options:
 
 "
 
-function run-subcmd () {
-    # run-subcmd {basedir} {subcmd} {args}
-    # task is of the form lang-{sub} or lang-{sub}
-    local base="$1"
-    local prefix="$2"
-    local lang="$3"
-    local target="$4"
-    shift 4
-    [[ -n "$target" ]] || fail "No Applicable language subcommand specified"
-    debug "- Checking for subcommand ${prefix}-$lang: $target"
-    [[ -d "$base/${prefix}-${lang}" ]] || fail "No Applicable lang Found: ${lang}"
-
-    subcmd-run "$base/${prefix}-${lang}" "$target"
-    return "$?"
-}
-
 maybe-print-help "branch" 2 "$HELP_TEXT" "$@"
 
 TARGET_LANG=""
@@ -47,7 +31,8 @@ LANG_ARGS=()
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -l|--list)
-            list-entries "$POLYGLOT_ROOT/.tasks" "lang" "$TARGET_LANG"
+            echo "Registered Languages: "
+            poly-list "lang" "$TARGET_LANG" "- "
             exit
             ;;
         *) # Positional
@@ -65,5 +50,4 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 subhead "Lang: $TARGET_LANG.$SUBCMD :(${#LANG_ARGS[@]}) ${LANG_ARGS[*]}"
-
-run-subcmd "$POLYGLOT_ROOT/.tasks" "lang" "$TARGET_LANG" "$SUBCMD" "${LANG_ARGS[@]}"
+run-lang-subcmd "$TARGET_LANG" "$SUBCMD" "${LANG_ARGS[@]}"

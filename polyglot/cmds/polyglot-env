@@ -6,13 +6,15 @@ set -o nounset
 set -o pipefail
 
 # shellcheck disable=SC1091
-source "$POLY_SRC/lib/lib-util.bash"
+source "$POLY_SRC/lib/lib.bash"
 
+STUB_HEADER="# -- Polyglot Vars (remember to add 'export' as necessary)"
+STUB_FOOTER="# -- End of Polyglot Vars"
 PRINTED_HELP="${PRINTED_HELP:-2}"
 HELP_TEXT="
 usage: polyglot env [-s] [-h]
 
-Print or Stub the env vars for .envrc
+Print or Stub env vars for .envrc
 
 options:
 -h, --help    : show this help message and exit
@@ -21,8 +23,8 @@ options:
 
 maybe-print-help "branch" 0 "$HELP_TEXT" "$@"
 
+# The simplest variables
 STUB_TEXT="
-# -- Core Polyglot Environment Variables for .envrc
 export POLYGLOT_ROOT=\"\$PWD\"
 
 export POLYGLOT_SRC=\"\$PWD/src\"
@@ -35,8 +37,10 @@ export POLYGLOT_DOCS=\"\$PWD/.temp/docs\"
 export POLYGLOT_DEFAULT_LANGS=\"python;rust\"
 export POLYGLOT_DEFAULT_TOOLS=\"mdbook\"
 export POLYGLOT_DEFAULT_TASKS=\"validate;sync;build;clean;docs;export;release\"
-# --
 "
+
+EXT_STUB_TEXT="${POLYGLOT_STUB_TEXT:-}"
+EXT_STUB_FILE="${POLYGLOT_STUB_FILE:-}"
 
 declare -a ARGS=(-e "POLYGLOT")
 for val in "${POLYGLOT_ENV_PREFIXES[@]}"
@@ -44,19 +48,24 @@ do
     ARGS+=(-e "$val")
 done
 
-# Print the stub:
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        -s|--stub)
-            echo -e "$STUB_TEXT"
-            exit 0
-            ;;
-        *)
-            ARGS+=(-e "$1")
-            ;;
-    esac
-    shift
+if [[ -f "${EXT_STUB_FILE}" ]]; then
+    STUB_TEXT=$(< "${EXT_STUB_FILE}")
+elif [[ -n "${EXT_STUB_TEXT}" ]]; then
+    STUB_TEXT="${EXT_STUB_TEXT}"
+fi
+
+BODY=""
+# Add polyglot vars to stub
+BODY+=$(env | grep "POLYGLOT")
+BODY+="${STUB_TEXT}"
+
+for arg in "$@"
+do
+    BODY+=$(env | grep "$arg")
 done
 
-# Or,
-env | grep "${ARGS[@]}" | sort
+echo "${STUB_HEADER}"
+echo "$BODY" | sort | uniq
+echo ""
+echo "${STUB_FOOTER}"
+

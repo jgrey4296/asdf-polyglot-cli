@@ -5,7 +5,7 @@ set -o nounset
 set -o pipefail
 
 # shellcheck disable=SC1091
-source "$POLY_SRC/lib/lib-util.bash"
+source "$POLY_SRC/lib/lib.bash"
 
 PRINTED_HELP="${PRINTED_HELP:-2}"
 HELP_TEXT="
@@ -23,20 +23,6 @@ options:
 
 "
 
-function run-tool-subcmd () {
-    # run-tool-subcmd {basedir} {subcmd} {args}
-    # task is of the form lang-{sub} or tool-{sub}
-    local base="$1"
-    local prefix="$2"
-    local tool="$3"
-    local target="$4"
-    shift 4
-    [[ -d "$base/${prefix}-${tool}" ]] || fail "No Applicable Tool Found: ${tool}"
-
-    subcmd-run "$base/${prefix}-${tool}" "${target}"
-    return "$?"
-}
-
 maybe-print-help "branch" 2 "$HELP_TEXT" "$@"
 TOOL=""
 SUBCMD=""
@@ -44,7 +30,8 @@ TOOL_ARGS=()
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
         -l|--list)
-            list-entries "$POLYGLOT_ROOT/.tasks" "tool" "$TOOL"
+            echo "Registered Tools: "
+            poly-list "tool" "$TOOL" "- "
             exit
             ;;
         *) # Positional
@@ -62,4 +49,4 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 subhead "Tool: $TOOL.$SUBCMD :(${#TOOL_ARGS[@]}) ${TOOL_ARGS[*]}"
-run-tool-subcmd "$POLYGLOT_ROOT/.tasks" "tool" "$TOOL" "$SUBCMD" "${TOOL_ARGS[@]}"
+run-tool-subcmd "$TOOL" "$SUBCMD" "${TOOL_ARGS[@]}"

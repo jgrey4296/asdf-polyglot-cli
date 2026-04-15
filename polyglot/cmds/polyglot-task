@@ -5,7 +5,7 @@ set -o nounset
 set -o pipefail
 
 # shellcheck disable=SC1091
-source "$POLY_SRC/lib/lib-util.bash"
+source "$POLY_SRC/lib/lib.bash"
 
 HELP_TEXT="
 usage: polyglot task [-l] [-hook=int] [target] [-h]
@@ -23,83 +23,6 @@ options:
 
 "
 
-function run-task () {
-    # run-hooks {basedir} {prefix} {dry} {task}
-    # task is of the form task-{}
-    local base="$1"
-    local prefix="$2"
-    local dry="$3"
-    local task="$4"
-    shift 4
-    local count=0
-    local ctx
-    [[ -d "$base/${prefix}-${task}" ]] || return "$NOTHING"
-
-    for hook in $(find "$base/${prefix}-${task}" -executable -a -type f | sort -V)
-    do
-        hname=$( basename "$hook" )
-        ctx=$(pushctx "$task")
-
-        if [[ "$dry" -gt 0 ]]; then
-            subhead "(dry) $hname ${*}"
-        else
-            (
-                POLY_SRC="$POLY_SRC" \
-                POLY_HOOK="$count" \
-                POLY_CTX="$ctx" \
-                "$hook" "$@"
-            )
-        fi
-        case "$?" in
-            0) # Normal hook completion
-                debug "- Hook Success"
-            ;;
-            1) # Hook Failed
-                fail "$(basename "$hook")"
-            ;;
-            "${PRINTED_HELP}") # Hook Printed Help
-                return 0
-            ;;
-            *) # Unknown result
-                fail "Unknown Result: ($?) : $task/""$(basename "$hook")"
-            ;;
-        esac
-        count=$(( 1 + count ))
-    done
-
-    header "Finished: $task. ($count) hooks ran."
-    return 0
-}
-
-function run-nth-hook () {
-    local base="$1"
-    local prefix="$2"
-    local nth="$3"
-    local task="$4"
-    shift 4
-    local count=0
-    echo -e "Running hook ($nth) with ($#) args: ${*} "
-
-    for hook in $(find "$base/${prefix}-${task}" -executable -a -type f | sort -V)
-    do
-        hname=$( basename "$hook" )
-        if [[ "$nth" = "$count" ]]; then
-            subhead "Running hook $count: $hname"
-            (
-                POLY_SRC="$POLY_SRC" \
-                    POLY_HOOK="$count" \
-                    "$hook" "$@"
-            )
-            subhead "Skipping remaining hooks"
-            exit 0
-        else
-            subhead "Skipping hook $count: $hname"
-            count=$(( 1 + count ))
-        fi
-    done
-    exit 0
-}
-
 # Maybe print cmd help
 maybe-print-help "branch" 1 "$HELP_TEXT" "$@"
 
@@ -110,7 +33,8 @@ TARGET=""
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
         -l|--list)
-            list-entries "$POLYGLOT_ROOT/.tasks" "task" "$TARGET"
+            echo "Registered Tasks: "
+            poly-list "task" "$TARGET" "- "
             exit
             ;;
         -d|--dry)
@@ -134,8 +58,8 @@ done
 subhead "Task $TARGET"
 
 if [[ -n "${NTH_HOOK:-}" ]]; then
-    run-nth-hook "$POLYGLOT_ROOT/.tasks" "task" "${NTH_HOOK}" "$TARGET" "${TASK_ARGS[@]}"
+    run-task-nth-hook "${NTH_HOOK}" "$TARGET" "${TASK_ARGS[@]}"
 else
-    run-task     "$POLYGLOT_ROOT/.tasks" "task" "$DO_DRY" "$TARGET" "${TASK_ARGS[@]}"
+    run-task "$DO_DRY" "$TARGET" "${TASK_ARGS[@]}"
 fi
 
