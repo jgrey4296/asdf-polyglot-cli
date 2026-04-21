@@ -73,6 +73,8 @@ function run-task () {
         target="$(poly-dir)/tasks/${task}"
     elif [[ -d "$(poly-dir)task-${task}" ]]; then
         target="$(poly-dir)/task-${task}"
+    else
+        fail "No Task Directory found: poly-dir($(poly-dir)) task(${task})"
     fi
 
 
